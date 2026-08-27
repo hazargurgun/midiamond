@@ -30,7 +30,7 @@ const productSchema = new mongoose.Schema({
     },
     imageUrl: {
         type: String,
-        default: '/assets/img/gallery/popular1.png'
+        default: '/uploads/premium_diamond_ring.png'
     },
     images: [{
         url: String,

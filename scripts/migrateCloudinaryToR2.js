@@ -1,5 +1,6 @@
 require('dotenv').config();
 
+const crypto = require('crypto');
 const mongoose = require('mongoose');
 const Product = require('../models/Product');
 const Banner = require('../models/Banner');
@@ -23,10 +24,65 @@ function shouldMigrate(url) {
     return isCloudinary(url) || /^https?:\/\//i.test(url);
 }
 
-async function download(url) {
-    const res = await fetch(url, { redirect: 'follow' });
+function parseCloudinaryUrl(url) {
+    const match = String(url).match(
+        /res\.cloudinary\.com\/([^/]+)\/(image|video|raw)\/upload\/(?:v\d+\/)?(.+)\.([a-zA-Z0-9]+)(?:\?|$)/i
+    );
+    if (!match) return null;
+    return {
+        cloud: match[1],
+        resourceType: match[2],
+        publicId: decodeURIComponent(match[3]),
+        format: match[4]
+    };
+}
+
+function signParams(params, apiSecret) {
+    const toSign = Object.keys(params)
+        .filter((key) => params[key] !== undefined && params[key] !== null && params[key] !== '')
+        .sort()
+        .map((key) => `${key}=${params[key]}`)
+        .join('&');
+    return crypto.createHash('sha1').update(toSign + apiSecret).digest('hex');
+}
+
+function privateDownloadUrl(parsed) {
+    const apiKey = process.env.CLOUDINARY_API_KEY;
+    const apiSecret = process.env.CLOUDINARY_API_SECRET;
+    if (!apiKey || !apiSecret) return null;
+
+    const cloud = process.env.CLOUDINARY_CLOUD_NAME || parsed.cloud;
+    const timestamp = Math.floor(Date.now() / 1000);
+    const params = {
+        public_id: parsed.publicId,
+        format: parsed.format,
+        timestamp,
+        type: 'upload'
+    };
+    const signature = signParams(params, apiSecret);
+    const query = new URLSearchParams({
+        public_id: parsed.publicId,
+        format: parsed.format,
+        timestamp: String(timestamp),
+        type: 'upload',
+        api_key: apiKey,
+        signature
+    });
+    return `https://api.cloudinary.com/v1_1/${cloud}/${parsed.resourceType}/download?${query}`;
+}
+
+function cloudinaryBasicAuth() {
+    const apiKey = process.env.CLOUDINARY_API_KEY;
+    const apiSecret = process.env.CLOUDINARY_API_SECRET;
+    if (!apiKey || !apiSecret) return null;
+    return 'Basic ' + Buffer.from(`${apiKey}:${apiSecret}`).toString('base64');
+}
+
+async function fetchOk(url, headers = {}) {
+    const res = await fetch(url, { redirect: 'follow', headers });
     if (!res.ok) {
-        throw new Error(`HTTP ${res.status} ${res.statusText}`);
+        const errText = await res.text().catch(() => '');
+        throw new Error(`HTTP ${res.status} ${res.statusText}${errText ? ': ' + errText.slice(0, 180) : ''}`);
     }
     const contentType = res.headers.get('content-type') || '';
     const buffer = Buffer.from(await res.arrayBuffer());
@@ -34,6 +90,66 @@ async function download(url) {
         throw new Error('Boş dosya');
     }
     return { buffer, contentType };
+}
+
+async function download(url) {
+    const errors = [];
+
+    try {
+        return await fetchOk(url);
+    } catch (err) {
+        errors.push(`public: ${err.message}`);
+    }
+
+    const parsed = parseCloudinaryUrl(url);
+    const basic = cloudinaryBasicAuth();
+
+    if (!basic) {
+        throw new Error(
+            `${errors.join(' | ')} | CLOUDINARY_API_KEY / CLOUDINARY_API_SECRET yok. Render env'e ekleyip tekrar çalıştırın.`
+        );
+    }
+
+    try {
+        return await fetchOk(url, { Authorization: basic });
+    } catch (err) {
+        errors.push(`basic: ${err.message}`);
+    }
+
+    if (parsed) {
+        const signed = privateDownloadUrl(parsed);
+        if (signed) {
+            try {
+                return await fetchOk(signed);
+            } catch (err) {
+                errors.push(`signed: ${err.message}`);
+            }
+        }
+
+        const cloud = process.env.CLOUDINARY_CLOUD_NAME || parsed.cloud;
+        const adminUrl = `https://api.cloudinary.com/v1_1/${cloud}/resources/${parsed.resourceType}/upload/${encodeURIComponent(parsed.publicId)}`;
+        try {
+            const metaRes = await fetch(adminUrl, { headers: { Authorization: basic } });
+            if (metaRes.ok) {
+                const meta = await metaRes.json();
+                const candidate = meta.secure_url || meta.url;
+                if (candidate) {
+                    try {
+                        return await fetchOk(candidate, { Authorization: basic });
+                    } catch (err) {
+                        errors.push(`admin-url: ${err.message}`);
+                    }
+                }
+            } else {
+                const body = await metaRes.text().catch(() => '');
+                errors.push(`admin: HTTP ${metaRes.status} ${body.slice(0, 120)}`);
+            }
+        } catch (err) {
+            errors.push(`admin: ${err.message}`);
+        }
+    }
+
+    throw new Error(errors.join(' | '));
 }
 
 async function migrateOne(url, folder) {
@@ -49,6 +165,15 @@ async function migrateOne(url, folder) {
 
 async function run() {
     requiredEnv();
+
+    if (!process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
+        console.log('UYARI: CLOUDINARY_API_KEY / CLOUDINARY_API_SECRET yok.');
+        console.log('Public CDN 401 olduğu için bu anahtarlar olmadan dosyalar inmez.');
+        console.log('Render Environment\'a eski Cloudinary key\'lerini ekleyip scripti tekrar çalıştırın.');
+    } else {
+        console.log('Cloudinary API anahtarları bulundu, imzalı indirme denenecek.');
+    }
+
     await mongoose.connect(process.env.MONGODB_URI);
     console.log('MongoDB bağlandı. Cloudinary → R2 göçü başlıyor...');
 
@@ -154,7 +279,7 @@ async function run() {
     console.log('Başarısız:', failed.length);
     if (failed.length) {
         console.log(JSON.stringify(failed, null, 2));
-        console.log('Başarısız olanları admin panelinden yeniden yükleyin.');
+        console.log('Hâlâ 401 ise Cloudinary hesabı tamamen kilitlidir; kısa süreliğine kredi yükleyip scripti tekrar çalıştırın veya admin’den yeniden yükleyin.');
     }
 
     await mongoose.disconnect();

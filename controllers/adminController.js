@@ -190,7 +190,7 @@ exports.addProduct = async (req, res) => {
         } = req.body;
 
         // Ana görsel: doğrudan dosya yüklemesi (multer → R2)
-        let imageUrl = '/assets/img/gallery/popular1.png';
+        let imageUrl = '/uploads/premium_diamond_ring.png';
         if (req.file) {
             imageUrl = req.file.path;
         }

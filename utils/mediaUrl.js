@@ -1,4 +1,4 @@
-const PLACEHOLDER = '/assets/img/gallery/popular1.png';
+const PLACEHOLDER = '/uploads/premium_diamond_ring.png';
 const VIDEO_EXT = /\.(mp4|webm|mov|ogg|m4v)(\?|$)/i;
 
 function isLocalAsset(url) {
@@ -12,6 +12,10 @@ function isCloudinary(url) {
     );
 }
 
+function isDummyThemeImage(url) {
+    return typeof url === 'string' && /\/gallery\/popular[1-4]\.png(\?|$)/.test(url);
+}
+
 function toThumb(url) {
     if (!url || VIDEO_EXT.test(url)) return url;
     if (url.includes('_thumb.')) return url;
@@ -20,10 +24,10 @@ function toThumb(url) {
 
 /**
  * Listing → 'thumb', PDP / banner / lightbox → 'large'
- * Cloudinary URL'leri (kredi bitmiş) placeholder'a düşer.
+ * Cloudinary ve eski tema dummy görselleri mücevher placeholder'ına düşer.
  */
 function mediaUrl(url, size) {
-    if (!url || isCloudinary(url)) {
+    if (!url || isCloudinary(url) || isDummyThemeImage(url)) {
         return PLACEHOLDER;
     }
     if (isLocalAsset(url)) {
