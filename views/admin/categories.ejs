@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kategori Yönetimi | Admin Paneli</title>
+    <link rel="stylesheet" href="/assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/assets/css/fontawesome-all.min.css">
+    <style>
+        body { font-family: 'Poppins', sans-serif; background-color: #f8f9fa; }
+        .sidebar { min-height: 100vh; background: #2c3e50; color: white; padding-top: 20px; }
+        .sidebar a { color: #bdc3c7; display: block; padding: 15px; text-decoration: none; transition: 0.3s; }
+        .sidebar a:hover, .sidebar a.active { background: #34495e; color: white; border-left: 4px solid #d4af37; }
+        .main-content { padding: 30px; }
+        .gold-text { color: #d4af37; }
+    </style>
+</head>
+<body>
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-2 sidebar">
+            <h4 class="text-center gold-text mb-4">MI DIAMOND ADMIN</h4>
+            <a href="/admin"><i class="fas fa-tachometer-alt mr-2"></i> Dashboard</a>
+            <a href="/admin/home-settings"><i class="fas fa-home mr-2"></i> Ana Sayfa Yönetimi</a>
+            <a href="/admin/products"><i class="fas fa-gem mr-2"></i> Ürünler</a>
+            <a href="/admin/categories" class="active"><i class="fas fa-list mr-2"></i> Kategoriler</a>
+            <a href="/admin/orders"><i class="fas fa-shopping-cart mr-2"></i> Siparişler</a>
+            <a href="/admin/users"><i class="fas fa-users mr-2"></i> Kullanıcılar</a>
+            <a href="/admin/support"><i class="fas fa-comments mr-2"></i> Canlı Destek</a>
+            <a href="/admin/banners"><i class="fas fa-image mr-2"></i> Bannerlar</a>
+            <a href="/"><i class="fas fa-external-link-alt mr-2"></i> Siteye Git</a>
+            <a href="/auth/logout" class="mt-5 text-danger"><i class="fas fa-sign-out-alt mr-2"></i> Çıkış Yap</a>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-md-10 main-content">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>Kategori Yönetimi</h2>
+                <button class="btn btn-warning" data-toggle="modal" data-target="#addCategoryModal">Yeni Kategori Ekle</button>
+            </div>
+            
+            <div class="card border-none shadow-sm">
+                <div class="card-body">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Sıra No</th>
+                                <th>Kategori Adı</th>
+                                <th>Slug</th>
+                                <th>İşlemler</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% categories.forEach(category => { %>
+                                <tr>
+                                    <td><span class="badge badge-warning text-dark font-weight-bold" style="font-size: 0.95rem; padding: 5px 12px;"><%= category.order || 0 %></span></td>
+                                    <td><%= category.name %></td>
+                                    <td><%= category.slug %></td>
+                                    <td>
+                                        <a href="#" class="btn btn-sm btn-warning mr-2" data-toggle="modal" data-target="#editCategoryModal" onclick="populateEditCategory('<%= category._id %>', '<%= category.name %>', '<%= category.order || 0 %>')"><i class="fas fa-edit"></i></a>
+                                        <a href="/admin/categories/delete/<%= category._id %>" class="btn btn-sm btn-danger" onclick="return confirm('Silmek istediğinize emin misiniz?')"><i class="fas fa-trash"></i></a>
+                                    </td>
+                                </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Category Modal -->
+<div class="modal fade" id="addCategoryModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Yeni Kategori Ekle</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form action="/admin/categories/add" method="POST">
+                <div class="modal-body">
+                    <div class="form-group mb-3">
+                        <label>Kategori Adı</label>
+                        <input type="text" name="name" class="form-control" placeholder="Örn: Yüzükler" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Sıralama Sırası (Order)</label>
+                        <input type="number" name="order" class="form-control" value="0" min="0" placeholder="Küçük sayılar daha önce gösterilir" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                    <button type="submit" class="btn btn-warning">Kategoriyi Kaydet</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Category Modal -->
+<div class="modal fade" id="editCategoryModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Kategori Düzenle</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="editCategoryForm" action="" method="POST">
+                <div class="modal-body">
+                    <div class="form-group mb-3">
+                        <label>Kategori Adı</label>
+                        <input type="text" id="editCategoryName" name="name" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Sıralama Sırası (Order)</label>
+                        <input type="number" id="editCategoryOrder" name="order" class="form-control" min="0" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                    <button type="submit" class="btn btn-warning">Değişiklikleri Kaydet</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="/assets/js/vendor/jquery-1.12.4.min.js"></script>
+<script src="/assets/js/bootstrap.min.js"></script>
+<script>
+    function populateEditCategory(id, name, order) {
+        document.getElementById('editCategoryName').value = name;
+        document.getElementById('editCategoryOrder').value = order;
+        document.getElementById('editCategoryForm').action = '/admin/categories/edit/' + id;
+    }
+</script>
+</body>
+</html>

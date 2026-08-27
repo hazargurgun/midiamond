@@ -1,0 +1,1117 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ürün Yönetimi | Admin Paneli</title>
+    <link rel="stylesheet" href="/assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/assets/css/fontawesome-all.min.css">
+    <style>
+        body { font-family: 'Poppins', sans-serif; background-color: #f8f9fa; }
+        .sidebar { min-height: 100vh; background: #2c3e50; color: white; padding-top: 20px; }
+        .sidebar a { color: #bdc3c7; display: block; padding: 15px; text-decoration: none; transition: 0.3s; }
+        .sidebar a:hover, .sidebar a.active { background: #34495e; color: white; border-left: 4px solid #d4af37; }
+        .main-content { padding: 30px; }
+        .gold-text { color: #d4af37; }
+    </style>
+</head>
+<body>
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-2 sidebar">
+            <h4 class="text-center gold-text mb-4">MI DIAMOND ADMIN</h4>
+            <a href="/admin"><i class="fas fa-tachometer-alt mr-2"></i> Dashboard</a>
+            <a href="/admin/home-settings"><i class="fas fa-home mr-2"></i> Ana Sayfa Yönetimi</a>
+            <a href="/admin/products" class="active"><i class="fas fa-gem mr-2"></i> Ürünler</a>
+            <a href="/admin/categories"><i class="fas fa-list mr-2"></i> Kategoriler</a>
+            <a href="/admin/orders"><i class="fas fa-shopping-cart mr-2"></i> Siparişler</a>
+            <a href="/admin/users"><i class="fas fa-users mr-2"></i> Kullanıcılar</a>
+            <a href="/admin/support"><i class="fas fa-comments mr-2"></i> Canlı Destek</a>
+            <a href="/admin/banners"><i class="fas fa-image mr-2"></i> Bannerlar</a>
+            <a href="/"><i class="fas fa-external-link-alt mr-2"></i> Siteye Git</a>
+            <a href="/auth/logout" class="mt-5 text-danger"><i class="fas fa-sign-out-alt mr-2"></i> Çıkış Yap</a>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-md-10 main-content">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>Ürün Yönetimi</h2>
+                <button class="btn btn-warning" data-toggle="modal" data-target="#addProductModal">Yeni Ürün Ekle</button>
+            </div>
+
+            <% const msg = typeof query !== 'undefined' ? query.msg : (typeof locals !== 'undefined' && locals.msg ? locals.msg : null); %>
+            <% const urlMsg = (function(){ try { return new URL(require ? 'http://x' : 'http://x').searchParams; } catch(e){ return null; } })(); %>
+            <script>
+            (function(){
+                const p = new URLSearchParams(window.location.search);
+                const msg = p.get('msg');
+                if (msg === 'success') {
+                    document.addEventListener('DOMContentLoaded', function() {
+                        showAdminAlert('Ürün başarıyla kaydedildi!', 'success');
+                    });
+                } else if (msg === 'doc_too_large') {
+                    document.addEventListener('DOMContentLoaded', function() {
+                        showAdminAlert('⚠️ Görseller çok büyük! Lütfen daha az veya daha küçük resim ekleyin (max ~4 resim tavsiye edilir).', 'danger');
+                    });
+                } else if (msg === 'video_too_large') {
+                    document.addEventListener('DOMContentLoaded', function() {
+                        showAdminAlert('⚠️ Video çok büyük! Lütfen 8MB altında bir video yükleyin.', 'danger');
+                    });
+                } else if (msg === 'error') {
+                    document.addEventListener('DOMContentLoaded', function() {
+                        showAdminAlert('Bir hata oluştu, lütfen tekrar deneyin.', 'danger');
+                    });
+                }
+                function showAdminAlert(text, type) {
+                    const div = document.createElement('div');
+                    div.className = 'alert alert-' + type + ' alert-dismissible fade show';
+                    div.innerHTML = text + '<button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>';
+                    const content = document.querySelector('.main-content');
+                    if (content) content.insertBefore(div, content.firstChild);
+                }
+            })();
+            </script>
+            
+            <div class="card border-none shadow-sm">
+                <div class="card-body">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Görsel</th>
+                                <th>Ürün Adı</th>
+                                <th>Kategori</th>
+                                <th>Fiyat</th>
+                                <th>Stok</th>
+                                <th>İşlemler</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% products.forEach(product => { %>
+                                <tr>
+                                    <td><img src="<%= mediaUrl(product.imageUrl, 'thumb') %>" width="50" alt=""></td>
+                                    <td><%= product.name %></td>
+                                    <td>
+                                        <% if (product.categories && product.categories.length > 0) { %>
+                                            <%= product.categories.map(c => (c.name ? c.name : (c.toString ? c.toString() : ''))).join(', ') %>
+                                        <% } else if (product.category) { %>
+                                            <%= product.category.name %>
+                                        <% } else { %>
+                                            Kategorisiz
+                                        <% } %>
+                                    </td>
+                                    <td>₺<%= product.price.toLocaleString('tr-TR') %></td>
+                                    <td><%= product.stock %></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-warning mr-2" data-toggle="modal" data-target="#editProductModal" onclick='populateEditProduct(<%- JSON.stringify(product).replace(/'/g, "\\'") %>)'><i class="fas fa-edit"></i></button>
+                                        <a href="/admin/products/delete/<%= product._id %>" class="btn btn-sm btn-danger" onclick="return confirm('Silmek istediğinize emin misiniz?')"><i class="fas fa-trash"></i></a>
+                                    </td>
+                                </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Product Modal -->
+<div class="modal fade" id="addProductModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Yeni Ürün Ekle</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form action="/admin/products/add" method="POST" enctype="multipart/form-data">
+                <div class="modal-body">
+                    <!-- Sekmeler -->
+                    <ul class="nav nav-tabs mb-3" id="addProductTabs" role="tablist">
+                        <li class="nav-item"><a class="nav-link active" data-toggle="tab" href="#addTab1">Temel Bilgiler</a></li>
+                        <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#addTab2">💎 Taş & Maden</a></li>
+                        <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#addTab3">📸 Görseller</a></li>
+                    </ul>
+                    <div class="tab-content">
+                        <!-- Sekme 1: Temel Bilgiler -->
+                        <div class="tab-pane fade show active" id="addTab1">
+                            <div class="form-group">
+                                <label>Ürün Adı</label>
+                                <input type="text" name="name" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Açıklama</label>
+                                <textarea name="description" class="form-control" rows="3" required></textarea>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Fiyat (₺)</label>
+                                        <input type="number" name="price" class="form-control" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Stok</label>
+                                        <input type="number" name="stock" class="form-control" value="1" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Kategoriler (Birden fazla seçebilirsiniz)</label>
+                                <select name="categories" class="form-control" multiple required style="height:140px;">
+                                    <% categories.forEach(cat => { %>
+                                        <option value="<%= cat._id %>"><%= cat.name %></option>
+                                    <% }); %>
+                                </select>
+                                <small class="text-muted">Ctrl / Cmd ile birden fazla kategori seçebilirsiniz.</small>
+                            </div>
+                            <div class="form-check mb-3">
+                                <input type="checkbox" name="isPopular" class="form-check-input" id="isPopular">
+                                <label class="form-check-label" for="isPopular">Öne Çıkan Ürün (Ana Sayfada Göster)</label>
+                            </div>
+                        </div>
+                        <!-- Sekme 2: Taş & Maden Bilgileri -->
+                        <div class="tab-pane fade" id="addTab2">
+                            <p class="text-muted small mb-3"><i class="fas fa-info-circle"></i> Tüm alanlar isteğe bağlıdır. Boş bırakılan alanlar ürün sayfasında gösterilmez.</p>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Ürün Kodu</label>
+                                        <input type="text" name="productCode" class="form-control" placeholder="YZ-ALT-RO-1CT-14-Y-123-S">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Sertifika</label>
+                                        <select name="certificate" class="form-control">
+                                            <option value="">-- Seçin (İsteğe Bağlı) --</option>
+                                            <option value="IGI">IGI</option>
+                                            <option value="GIA">GIA</option>
+                                            <option value="HRD">HRD</option>
+                                            <option value="Sertifikasız">Sertifikasız</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Maden</label>
+                                        <select name="metal" class="form-control">
+                                            <option value="">-- Seçin --</option>
+                                            <option value="14k Altın">14k Altın</option>
+                                            <option value="18k Altın">18k Altın</option>
+                                            <option value="Gümüş">Gümüş</option>
+                                            <option value="Platin">Platin</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Maden Rengi</label>
+                                        <select name="metalColor" class="form-control">
+                                            <option value="">-- Seçin --</option>
+                                            <option value="Sarı Altın">Sarı Altın</option>
+                                            <option value="Beyaz Altın">Beyaz Altın</option>
+                                            <option value="Rose Gold">Rose Gold</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Değerli Taş Tipi</label>
+                                        <select name="gemType" class="form-control">
+                                            <option value="">-- Seçin --</option>
+                                            <option value="Lab. Pırlanta">Lab. Pırlanta</option>
+                                            <option value="Doğal Pırlanta">Doğal Pırlanta</option>
+                                            <option value="Yakut">Yakut</option>
+                                            <option value="Zümrüt">Zümrüt</option>
+                                            <option value="Safir">Safir</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Tek Karat Ağırlığı (ct) <small class="text-muted">(Çoklu seçenek yoksa)</small></label>
+                                        <input type="number" name="caratWeight" class="form-control" placeholder="Örn: 1.08" step="0.01" min="0">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-12">
+                                    <div class="form-group border p-3 rounded" style="background-color: #fcfcfc;">
+                                        <label class="font-weight-bold d-flex justify-content-between align-items-center mb-2">
+                                            <span>Çoklu Karat & Fiyat Seçenekleri <small class="text-muted">(Karata göre fiyat değişsin istiyorsanız burayı doldurun)</small></span>
+                                            <button type="button" class="btn btn-sm btn-outline-warning" id="addCaratOptionBtn">
+                                                <i class="fas fa-plus"></i> Seçenek Ekle
+                                            </button>
+                                        </label>
+                                        <div id="caratOptionsContainer" class="d-flex flex-column gap-2">
+                                            <!-- Dinamik satırlar buraya eklenecek -->
+                                        </div>
+                                        <small class="text-muted mt-1 d-block"><i class="fas fa-info-circle"></i> Kullanıcı ürün detay sayfasında karat seçince buradaki fiyat aktif olur. Boş bırakırsanız sadece yukarıdaki fiyat geçerlidir.</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>Taş Rengi</label>
+                                        <select name="gemColor" class="form-control">
+                                            <option value="">-- Seçin --</option>
+                                            <option value="D">D</option>
+                                            <option value="E">E</option>
+                                            <option value="F">F</option>
+                                            <option value="G">G</option>
+                                            <option value="H">H</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>Berraklık</label>
+                                        <select name="gemClarity" class="form-control">
+                                            <option value="">-- Seçin --</option>
+                                            <option value="IF">IF</option>
+                                            <option value="VVS1">VVS1</option>
+                                            <option value="VVS2">VVS2</option>
+                                            <option value="VS1">VS1</option>
+                                            <option value="VS2">VS2</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>Kesim / Şekil</label>
+                                        <select name="gemCut" class="form-control">
+                                            <option value="">-- Seçin --</option>
+                                            <option value="Round">Round</option>
+                                            <option value="Marquise">Marquise</option>
+                                            <option value="Oval">Oval</option>
+                                            <option value="Princess">Princess</option>
+                                            <option value="Pear">Pear</option>
+                                            <option value="Emerald">Emerald</option>
+                                            <option value="Cushion">Cushion</option>
+                                            <option value="Heart">Heart</option>
+                                            <option value="Radiant">Radiant</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Sekme 3: Görseller -->
+                        <div class="tab-pane fade" id="addTab3">
+                            <div class="form-group">
+                                <label>Ana Görsel (Katalog Resmi)</label>
+                                <div class="custom-file mb-3">
+                                    <input type="file" class="custom-file-input" id="customFile" name="imageFile" accept="image/*" required>
+                                    <label class="custom-file-label" for="customFile">Dosya Seçin veya Sürükleyin...</label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Galeri Görselleri <small class="text-muted">(Birden fazla seçilebilir — sürükleyerek sıralayın)</small></label>
+                                <div class="custom-file mb-3">
+                                    <!-- name yok: AJAX ile R2'ye yüklenir, hidden input ile gönderilir -->
+                                    <input type="file" class="custom-file-input" id="galleryFiles" accept="image/*" multiple>
+                                    <label class="custom-file-label" for="galleryFiles">Birden Fazla Dosya Seçebilirsiniz...</label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Ürün Tanıtım Videosu <small class="text-muted">(İsteğe Bağlı)</small></label>
+                                <div class="custom-file mb-3">
+                                    <!-- name yok: AJAX ile R2'ye yüklenir, hidden input ile gönderilir -->
+                                    <input type="file" class="custom-file-input" id="videoFile" accept="video/mp4,video/webm">
+                                    <label class="custom-file-label" for="videoFile">MP4 veya WebM Video Seçin...</label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="font-weight-bold gold-text">Galeri & Video Sıralaması <small class="text-muted">(Sürükleyerek sıralayın)</small></label>
+                                <div id="createMediaContainer" class="d-flex flex-wrap gap-2 mt-3" style="min-height: 80px; border: 1px dashed #ced4da; border-radius: 8px; padding: 10px; background-color: #fcfcfc;">
+                                    <span class="text-muted w-100 text-center" id="createMediaEmptyText">Henüz görsel veya video eklenmedi.</span>
+                                </div>
+                                <div id="createMediaHiddenInputs"></div>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                    <button type="submit" class="btn btn-warning">Ürünü Kaydet</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Product Modal -->
+<div class="modal fade" id="editProductModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Ürün Düzenle</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="editProductForm" action="" method="POST" enctype="multipart/form-data">
+                <div class="modal-body">
+                    <!-- Sekmeler -->
+                    <ul class="nav nav-tabs mb-3" id="editProductTabs" role="tablist">
+                        <li class="nav-item"><a class="nav-link active" data-toggle="tab" href="#editTab1">Temel Bilgiler</a></li>
+                        <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#editTab2">💎 Taş & Maden</a></li>
+                        <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#editTab3">📸 Görseller</a></li>
+                    </ul>
+                    <div class="tab-content">
+                        <!-- Sekme 1: Temel Bilgiler -->
+                        <div class="tab-pane fade show active" id="editTab1">
+                            <div class="form-group">
+                                <label>Ürün Adı</label>
+                                <input type="text" id="editProductName" name="name" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Açıklama</label>
+                                <textarea id="editProductDescription" name="description" class="form-control" rows="3" required></textarea>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Fiyat (₺)</label>
+                                        <input type="number" id="editProductPrice" name="price" class="form-control" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Stok</label>
+                                        <input type="number" id="editProductStock" name="stock" class="form-control" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Kategoriler (Birden fazla seçebilirsiniz)</label>
+                                <select id="editProductCategory" name="categories" class="form-control" multiple required style="height:140px;">
+                                    <% categories.forEach(cat => { %>
+                                        <option value="<%= cat._id %>"><%= cat.name %></option>
+                                    <% }); %>
+                                </select>
+                                <small class="text-muted">Ctrl / Cmd ile birden fazla kategori seçebilirsiniz.</small>
+                            </div>
+                            <div class="form-check mb-3">
+                                <input type="checkbox" name="isPopular" class="form-check-input" id="editProductIsPopular">
+                                <label class="form-check-label" for="editProductIsPopular">Öne Çıkan Ürün (Ana Sayfada Göster)</label>
+                            </div>
+                        </div>
+                        <!-- Sekme 2: Taş & Maden -->
+                        <div class="tab-pane fade" id="editTab2">
+                            <p class="text-muted small mb-3"><i class="fas fa-info-circle"></i> Tüm alanlar isteğe bağlıdır. Boş bırakılan alanlar ürün sayfasında gösterilmez.</p>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Ürün Kodu</label>
+                                        <input type="text" id="editProductCode" name="productCode" class="form-control" placeholder="YZ-ALT-RO-1CT-14-Y-123-S">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Sertifika</label>
+                                        <select id="editCertificate" name="certificate" class="form-control">
+                                            <option value="">-- Seçin (İsteğe Bağlı) --</option>
+                                            <option value="IGI">IGI</option>
+                                            <option value="GIA">GIA</option>
+                                            <option value="HRD">HRD</option>
+                                            <option value="Sertifikasız">Sertifikasız</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Maden</label>
+                                        <select id="editMetal" name="metal" class="form-control">
+                                            <option value="">-- Seçin --</option>
+                                            <option value="14k Altın">14k Altın</option>
+                                            <option value="18k Altın">18k Altın</option>
+                                            <option value="Gümüş">Gümüş</option>
+                                            <option value="Platin">Platin</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Maden Rengi</label>
+                                        <select id="editMetalColor" name="metalColor" class="form-control">
+                                            <option value="">-- Seçin --</option>
+                                            <option value="Sarı Altın">Sarı Altın</option>
+                                            <option value="Beyaz Altın">Beyaz Altın</option>
+                                            <option value="Rose Gold">Rose Gold</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Değerli Taş Tipi</label>
+                                        <select id="editGemType" name="gemType" class="form-control">
+                                            <option value="">-- Seçin --</option>
+                                            <option value="Lab. Pırlanta">Lab. Pırlanta</option>
+                                            <option value="Doğal Pırlanta">Doğal Pırlanta</option>
+                                            <option value="Yakut">Yakut</option>
+                                            <option value="Zümrüt">Zümrüt</option>
+                                            <option value="Safir">Safir</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Tek Karat Ağırlığı (ct) <small class="text-muted">(Çoklu seçenek yoksa)</small></label>
+                                        <input type="number" id="editCaratWeight" name="caratWeight" class="form-control" placeholder="Örn: 1.08" step="0.01" min="0">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-12">
+                                    <div class="form-group border p-3 rounded" style="background-color: #fcfcfc;">
+                                        <label class="font-weight-bold d-flex justify-content-between align-items-center mb-2">
+                                            <span>Çoklu Karat & Fiyat Seçenekleri <small class="text-muted">(Karata göre fiyat değişsin istiyorsanız burayı doldurun)</small></span>
+                                            <button type="button" class="btn btn-sm btn-outline-warning" id="editAddCaratOptionBtn">
+                                                <i class="fas fa-plus"></i> Seçenek Ekle
+                                            </button>
+                                        </label>
+                                        <div id="editCaratOptionsContainer" class="d-flex flex-column gap-2">
+                                            <!-- Dinamik satırlar buraya eklenecek -->
+                                        </div>
+                                        <small class="text-muted mt-1 d-block"><i class="fas fa-info-circle"></i> Kullanıcı ürün detay sayfasında karat seçince buradaki fiyat aktif olur. Boş bırakırsanız sadece yukarıdaki fiyat geçerlidir.</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>Taş Rengi</label>
+                                        <select id="editGemColor" name="gemColor" class="form-control">
+                                            <option value="">-- Seçin --</option>
+                                            <option value="D">D</option>
+                                            <option value="E">E</option>
+                                            <option value="F">F</option>
+                                            <option value="G">G</option>
+                                            <option value="H">H</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>Berraklık</label>
+                                        <select id="editGemClarity" name="gemClarity" class="form-control">
+                                            <option value="">-- Seçin --</option>
+                                            <option value="IF">IF</option>
+                                            <option value="VVS1">VVS1</option>
+                                            <option value="VVS2">VVS2</option>
+                                            <option value="VS1">VS1</option>
+                                            <option value="VS2">VS2</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>Kesim / Şekil</label>
+                                        <select id="editGemCut" name="gemCut" class="form-control">
+                                            <option value="">-- Seçin --</option>
+                                            <option value="Round">Round</option>
+                                            <option value="Marquise">Marquise</option>
+                                            <option value="Oval">Oval</option>
+                                            <option value="Princess">Princess</option>
+                                            <option value="Pear">Pear</option>
+                                            <option value="Emerald">Emerald</option>
+                                            <option value="Cushion">Cushion</option>
+                                            <option value="Heart">Heart</option>
+                                            <option value="Radiant">Radiant</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Sekme 3: Görseller -->
+                        <div class="tab-pane fade" id="editTab3">
+                            <div class="form-group">
+                                <label>Yeni Ana Görsel (Değiştirmek isterseniz seçin)</label>
+                                <div class="custom-file mb-3">
+                                    <input type="file" class="custom-file-input" id="editCustomFile" name="imageFile" accept="image/*">
+                                    <label class="custom-file-label" for="editCustomFile">Dosya Seçin veya Sürükleyin...</label>
+                                </div>
+                                <small class="text-muted">Görsel seçmezseniz eski görsel kullanılmaya devam eder.</small>
+                            </div>
+                            <!-- Draggable Current Media Grid -->
+                            <div class="form-group">
+                                <label class="font-weight-bold">Mevcut Galeri Görselleri ve Video Sıralaması</label>
+                                <div id="editMediaContainer" class="d-flex flex-wrap align-items-center p-3 border rounded bg-white" style="min-height: 110px; gap: 12px;"></div>
+                                <small class="text-muted d-block mt-1">Sürükleyip bırakarak sıralayabilirsiniz. <i class="fas fa-trash-alt text-danger"></i> ile silebilirsiniz.</small>
+                                <div id="editMediaHiddenInputs"></div>
+                                <input type="hidden" name="deleteVideo" id="deleteVideoInput" value="false">
+                            </div>
+                            <div class="form-group">
+                                <label>Yeni Galeri Görselleri Ekle</label>
+                                <div class="custom-file mb-3">
+                                    <input type="file" class="custom-file-input" id="editGalleryFiles" name="galleryImages" accept="image/*" multiple>
+                                    <label class="custom-file-label" for="editGalleryFiles">Birden Fazla Dosya Seçebilirsiniz...</label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Yeni Tanıtım Videosu (Mevcut videoyu değiştirir)</label>
+                                <div class="custom-file mb-3">
+                                    <input type="file" class="custom-file-input" id="editVideoFile" name="videoFile" accept="video/mp4,video/webm">
+                                    <label class="custom-file-label" for="editVideoFile">MP4 veya WebM Video Seçin...</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                    <button type="submit" class="btn btn-warning">Değişiklikleri Kaydet</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="/assets/js/vendor/jquery-1.12.4.min.js"></script>
+<script src="/assets/js/bootstrap.min.js"></script>
+<script>
+    let dragSourceElement = null;
+
+    function handleDragStart(e) {
+        this.style.opacity = '0.4';
+        dragSourceElement = this;
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/html', this.innerHTML);
+    }
+
+    function handleDragOver(e) {
+        if (e.preventDefault) {
+            e.preventDefault();
+        }
+        e.dataTransfer.dropEffect = 'move';
+        return false;
+    }
+
+    function handleDrop(e) {
+        if (e.stopPropagation) {
+            e.stopPropagation();
+        }
+        
+        if (dragSourceElement !== this) {
+            // Swap content and dataset
+            const tempHTML = this.innerHTML;
+            const tempType = this.dataset.type;
+            const tempUrl = this.dataset.url;
+            
+            this.innerHTML = dragSourceElement.innerHTML;
+            this.dataset.type = dragSourceElement.dataset.type;
+            this.dataset.url = dragSourceElement.dataset.url;
+            
+            dragSourceElement.innerHTML = tempHTML;
+            dragSourceElement.dataset.type = tempType;
+            dragSourceElement.dataset.url = tempUrl;
+            
+            const container = this.parentElement || dragSourceElement.parentElement;
+            if (container && container.id === 'createMediaContainer') {
+                serializeCreateMediaState();
+            } else {
+                serializeMediaState();
+            }
+        }
+        return false;
+    }
+
+    function handleDragEnd(e) {
+        this.style.opacity = '1';
+        const container = this.parentElement;
+        if (container && container.id === 'createMediaContainer') {
+            serializeCreateMediaState();
+        } else {
+            serializeMediaState();
+        }
+    }
+
+    function removeMediaItem(button) {
+        const item = button.closest('.draggable-media-item');
+        if (!item) return;
+        const container = item.parentElement;
+        const isEdit = (container && container.id === 'editMediaContainer');
+        
+        if (item.dataset.type === 'video' && isEdit) {
+            document.getElementById('deleteVideoInput').value = 'true';
+        }
+        item.remove();
+        
+        if (container.querySelectorAll('.draggable-media-item').length === 0) {
+            if (isEdit) {
+                container.innerHTML = '<span class="text-muted w-100 text-center">Bu ürünün henüz galeri görseli veya videosu yok.</span>';
+            } else {
+                container.innerHTML = '<span class="text-muted w-100 text-center" id="createMediaEmptyText">Henüz galeri görseli veya videosu eklenmedi.</span>';
+            }
+        }
+        
+        if (isEdit) {
+            serializeMediaState();
+        } else {
+            serializeCreateMediaState();
+        }
+    }
+
+    function serializeMediaState() {
+        const container = document.getElementById('editMediaContainer');
+        const hiddenContainer = document.getElementById('editMediaHiddenInputs');
+        if (!container || !hiddenContainer) return;
+        hiddenContainer.innerHTML = '';
+        
+        const items = container.querySelectorAll('.draggable-media-item');
+        items.forEach((item, index) => {
+            if (item.dataset.type === 'image') {
+                const inputUrl = document.createElement('input');
+                inputUrl.type = 'hidden';
+                inputUrl.name = 'existingImages';
+                inputUrl.value = item.dataset.url;
+                hiddenContainer.appendChild(inputUrl);
+
+                const inputOrder = document.createElement('input');
+                inputOrder.type = 'hidden';
+                inputOrder.name = 'existingImagesOrder';
+                inputOrder.value = index;
+                hiddenContainer.appendChild(inputOrder);
+            } else if (item.dataset.type === 'video') {
+                // Video URL'si de kaydedilmeli
+                const inputVideoUrl = document.createElement('input');
+                inputVideoUrl.type = 'hidden';
+                inputVideoUrl.name = 'videoUrl';
+                inputVideoUrl.value = item.dataset.url;
+                hiddenContainer.appendChild(inputVideoUrl);
+
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'videoOrder';
+                input.value = index;
+                hiddenContainer.appendChild(input);
+            }
+        });
+    }
+
+    function serializeCreateMediaState() {
+        const container = document.getElementById('createMediaContainer');
+        const hiddenContainer = document.getElementById('createMediaHiddenInputs');
+        if (!container || !hiddenContainer) return;
+        hiddenContainer.innerHTML = '';
+        
+        const items = container.querySelectorAll('.draggable-media-item');
+        items.forEach((item, index) => {
+            if (item.dataset.type === 'image') {
+                const inputUrl = document.createElement('input');
+                inputUrl.type = 'hidden';
+                inputUrl.name = 'existingImages';
+                inputUrl.value = item.dataset.url;
+                hiddenContainer.appendChild(inputUrl);
+
+                const inputOrder = document.createElement('input');
+                inputOrder.type = 'hidden';
+                inputOrder.name = 'existingImagesOrder';
+                inputOrder.value = index;
+                hiddenContainer.appendChild(inputOrder);
+            } else if (item.dataset.type === 'video') {
+                // Video R2 URL'si hidden input olarak gönderilir
+                const inputVideoUrl = document.createElement('input');
+                inputVideoUrl.type = 'hidden';
+                inputVideoUrl.name = 'videoUrl';
+                inputVideoUrl.value = item.dataset.url;
+                hiddenContainer.appendChild(inputVideoUrl);
+
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'videoOrder';
+                input.value = index;
+                hiddenContainer.appendChild(input);
+            }
+        });
+    }
+
+    function populateEditProduct(product) {
+        document.getElementById('editProductForm').action = '/admin/products/edit/' + product._id;
+        document.getElementById('editProductName').value = product.name;
+        document.getElementById('editProductDescription').value = product.description;
+        document.getElementById('editProductPrice').value = product.price;
+        document.getElementById('editProductStock').value = product.stock;
+        
+        // Set multiple selected categories if available
+        try {
+            const sel = document.getElementById('editProductCategory');
+            for (let i = 0; i < sel.options.length; i++) sel.options[i].selected = false;
+            if (product.categories && product.categories.length > 0) {
+                product.categories.forEach(cat => {
+                    const val = cat._id || cat;
+                    for (let i = 0; i < sel.options.length; i++) {
+                        if (sel.options[i].value === (val.toString ? val.toString() : val)) sel.options[i].selected = true;
+                    }
+                });
+            } else if (product.category) {
+                const val = product.category._id || product.category;
+                for (let i = 0; i < sel.options.length; i++) {
+                    if (sel.options[i].value === (val.toString ? val.toString() : val)) sel.options[i].selected = true;
+                }
+            }
+        } catch(e) {}
+
+        document.getElementById('editProductIsPopular').checked = product.isPopular;
+        document.getElementById('deleteVideoInput').value = 'false';
+
+        // Mücevher alanlarını doldur
+        document.getElementById('editProductCode').value = product.productCode || '';
+        document.getElementById('editCertificate').value = product.certificate || '';
+        document.getElementById('editMetal').value = product.metal || '';
+        document.getElementById('editMetalColor').value = product.metalColor || '';
+        document.getElementById('editGemType').value = product.gemType || '';
+        document.getElementById('editCaratWeight').value = (product.caratWeight !== null && product.caratWeight !== undefined) ? product.caratWeight : '';
+        document.getElementById('editGemColor').value = product.gemColor || '';
+        document.getElementById('editGemClarity').value = product.gemClarity || '';
+        document.getElementById('editGemCut').value = product.gemCut || '';
+
+        
+        let mediaList = [];
+        if (product.images && product.images.length > 0) {
+            product.images.forEach(img => {
+                mediaList.push({ type: 'image', url: img.url, order: img.order || 0 });
+            });
+        }
+        if (product.videoUrl) {
+            let vOrder = (product.videoOrder !== undefined && product.videoOrder !== null) ? product.videoOrder : 99;
+            mediaList.push({ type: 'video', url: product.videoUrl, order: vOrder });
+        }
+        
+        mediaList.sort((a, b) => a.order - b.order);
+        
+        const container = document.getElementById('editMediaContainer');
+        container.innerHTML = '';
+        
+        if (mediaList.length === 0) {
+            container.innerHTML = '<span class="text-muted w-100 text-center">Bu ürünün henüz galeri görseli veya videosu yok.</span>';
+        } else {
+            mediaList.forEach(media => {
+                const itemEl = document.createElement('div');
+                itemEl.className = `position-relative draggable-media-item ${media.type === 'video' ? 'border border-primary rounded shadow-sm' : 'border border-light rounded shadow-sm'}`;
+                itemEl.style.width = '80px';
+                itemEl.style.height = '80px';
+                itemEl.style.cursor = 'move';
+                itemEl.draggable = true;
+                itemEl.dataset.type = media.type;
+                itemEl.dataset.url = media.url;
+                
+                let innerHTML = '';
+                if (media.type === 'image') {
+                    innerHTML = `
+                        <img src="${media.url}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">
+                        <button type="button" class="btn btn-sm btn-danger position-absolute" style="top: -5px; right: -5px; padding: 2px 6px; border-radius: 50%; font-size: 10px; z-index: 10;" onclick="removeMediaItem(this)">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    `;
+                } else {
+                    innerHTML = `
+                        <div class="bg-dark text-white d-flex flex-column align-items-center justify-content-center" style="width: 100%; height: 100%; border-radius: 8px;">
+                            <i class="fas fa-video fa-lg gold-text mb-1"></i>
+                            <span style="font-size: 9px; font-weight: bold; letter-spacing: 0.5px;">VİDEO</span>
+                        </div>
+                        <button type="button" class="btn btn-sm btn-danger position-absolute" style="top: -5px; right: -5px; padding: 2px 6px; border-radius: 50%; font-size: 10px; z-index: 10;" onclick="removeMediaItem(this)">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    `;
+                }
+                itemEl.innerHTML = innerHTML;
+                
+                itemEl.addEventListener('dragstart', handleDragStart);
+                itemEl.addEventListener('dragover', handleDragOver);
+                itemEl.addEventListener('drop', handleDrop);
+                itemEl.addEventListener('dragend', handleDragEnd);
+                
+                container.appendChild(itemEl);
+            });
+        }
+        
+        serializeMediaState();
+
+        // Coklu Karat Seceneklerini doldur
+        const editCaratContainer = document.getElementById('editCaratOptionsContainer');
+        editCaratContainer.innerHTML = '';
+        if (product.caratOptions && product.caratOptions.length > 0) {
+            product.caratOptions.forEach(opt => {
+                addCaratOptionRow(editCaratContainer, opt.carat, opt.price);
+            });
+        }
+    }
+
+    // AJAX ile dosyayı R2'ye yükler ve thumbnail oluşturur
+    function uploadAndAddMedia(file, container, isEdit, mediaType) {
+        // \u00d6nce y\u00fckleniyor g\u00f6stergesi ekle
+        const loadingEl = document.createElement('div');
+        loadingEl.className = 'position-relative border border-light rounded shadow-sm d-flex align-items-center justify-content-center bg-light';
+        loadingEl.style.cssText = 'width:80px;height:80px;flex-shrink:0;';
+        loadingEl.innerHTML = '<i class="fas fa-spinner fa-spin text-primary fa-lg"></i>';
+        const emptyCreate = document.getElementById('createMediaEmptyText');
+        if (emptyCreate) emptyCreate.remove();
+        const emptyEdit = container.querySelector('.text-muted');
+        if (emptyEdit && (emptyEdit.innerText.includes('Hen\u00fcz') || emptyEdit.innerText.includes('Bu \u00fcr\u00fcn'))) {
+            container.innerHTML = '';
+        }
+        container.appendChild(loadingEl);
+
+        const formData = new FormData();
+        formData.append('file', file);
+
+        $.ajax({
+            url: '/admin/upload-temp',
+            method: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                loadingEl.remove();
+                if (!response.success) {
+                    alert('Y\u00fckleme hatas\u0131: ' + (response.message || 'Bilinmeyen hata'));
+                    return;
+                }
+                const url = response.url;
+                const itemEl = document.createElement('div');
+                itemEl.className = 'position-relative draggable-media-item border border-light rounded shadow-sm';
+                itemEl.style.cssText = 'width:80px;height:80px;cursor:move;flex-shrink:0;';
+                itemEl.draggable = true;
+                itemEl.dataset.type = mediaType;
+                itemEl.dataset.url = url;
+
+                if (mediaType === 'image') {
+                    itemEl.innerHTML = `
+                        <img src="${url}" style="width:100%;height:100%;object-fit:cover;border-radius:8px;">
+                        <button type="button" class="btn btn-sm btn-danger position-absolute" style="top:-5px;right:-5px;padding:2px 6px;border-radius:50%;font-size:10px;z-index:10;" onclick="removeMediaItem(this)">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>`;
+                } else {
+                    itemEl.innerHTML = `
+                        <div class="bg-dark text-white d-flex flex-column align-items-center justify-content-center" style="width:100%;height:100%;border-radius:8px;">
+                            <i class="fas fa-video fa-lg text-primary mb-1"></i>
+                            <span style="font-size:8px;font-weight:bold;color:#007bff;">V\u0130DEO</span>
+                        </div>
+                        <button type="button" class="btn btn-sm btn-danger position-absolute" style="top:-5px;right:-5px;padding:2px 6px;border-radius:50%;font-size:10px;z-index:10;" onclick="removeMediaItem(this)">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>`;
+                }
+
+                itemEl.addEventListener('dragstart', handleDragStart);
+                itemEl.addEventListener('dragover', handleDragOver);
+                itemEl.addEventListener('drop', handleDrop);
+                itemEl.addEventListener('dragend', handleDragEnd);
+                container.appendChild(itemEl);
+
+                if (isEdit) {
+                    serializeMediaState();
+                } else {
+                    serializeCreateMediaState();
+                }
+            },
+            error: function() {
+                loadingEl.remove();
+                alert('Görsel/video yükleme hatası oluştu. Bağlantınızı ve R2 ayarlarını kontrol edin.');
+            }
+        });
+    }
+
+    // Helper function to compress images on the client side before upload
+    function compressImage(file, callback) {
+        if (!file || !file.type.startsWith('image/')) {
+            callback(file);
+            return;
+        }
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = function(event) {
+            const img = new Image();
+            img.src = event.target.result;
+            img.onload = function() {
+                const canvas = document.createElement('canvas');
+                let width = img.width;
+                let height = img.height;
+                const MAX_WIDTH = 1200;
+                const MAX_HEIGHT = 1200;
+                
+                if (width > height) {
+                    if (width > MAX_WIDTH) {
+                        height *= MAX_WIDTH / width;
+                        width = MAX_WIDTH;
+                    }
+                } else {
+                    if (height > MAX_HEIGHT) {
+                        width *= MAX_HEIGHT / height;
+                        height = MAX_HEIGHT;
+                    }
+                }
+                
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+                
+                canvas.toBlob(function(blob) {
+                    const compressedFile = new File([blob], file.name, {
+                        type: 'image/jpeg',
+                        lastModified: Date.now()
+                    });
+                    if (compressedFile.size < file.size) {
+                        callback(compressedFile);
+                    } else {
+                        callback(file);
+                    }
+                }, 'image/jpeg', 0.8); // 80% JPEG quality is excellent and lightweight
+            };
+        };
+        reader.onerror = function() {
+            callback(file);
+        };
+    }
+
+    // ADD modal — galeri görselleri seçince AJAX ile R2'ye yükle (sıkıştırılmış olarak)
+    $('#galleryFiles').on('change', function(e) {
+        const files = e.target.files;
+        if (!files || files.length === 0) return;
+        const container = document.getElementById('createMediaContainer');
+        Array.from(files).forEach(file => {
+            compressImage(file, function(compressedFile) {
+                uploadAndAddMedia(compressedFile, container, false, 'image');
+            });
+        });
+        $(this).next('.custom-file-label').addClass('selected').html(files.length + ' görsel yükleniyor...');
+        this.value = ''; // Input'u sıfırla
+    });
+
+    // ADD modal — video seçince AJAX ile R2'ye yükle
+    $('#videoFile').on('change', function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        const container = document.getElementById('createMediaContainer');
+        // Varsa eski video thumbnailını kaldır
+        container.querySelectorAll('.draggable-media-item[data-type="video"]').forEach(el => el.remove());
+        uploadAndAddMedia(file, container, false, 'video');
+        $(this).next('.custom-file-label').addClass('selected').html(file.name + ' yükleniyor...');
+        this.value = '';
+    });
+
+    // EDIT modal — yeni galeri görselleri seçince AJAX ile R2'ye yükle (sıkıştırılmış olarak)
+    $('#editGalleryFiles').on('change', function(e) {
+        const files = e.target.files;
+        if (!files || files.length === 0) return;
+        const container = document.getElementById('editMediaContainer');
+        Array.from(files).forEach(file => {
+            compressImage(file, function(compressedFile) {
+                uploadAndAddMedia(compressedFile, container, true, 'image');
+            });
+        });
+        $(this).next('.custom-file-label').addClass('selected').html(files.length + ' görsel yükleniyor...');
+        this.value = '';
+    });
+
+    // EDIT modal — video seçince AJAX ile R2'ye yükle
+    $('#editVideoFile').on('change', function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        const container = document.getElementById('editMediaContainer');
+        container.querySelectorAll('.draggable-media-item[data-type="video"]').forEach(el => el.remove());
+        uploadAndAddMedia(file, container, true, 'video');
+        $(this).next('.custom-file-label').addClass('selected').html(file.name + ' yükleniyor...');
+        this.value = '';
+    });
+
+
+    // Bootstrap Custom File Input for generic name (with automatic client-side image compression)
+    $('.custom-file-input').not('#editGalleryFiles, #editVideoFile, #galleryFiles, #videoFile').on('change', function(e) { 
+        const inputEl = this;
+        const file = e.target.files ? e.target.files[0] : null;
+        
+        if (file && file.type.startsWith('image/')) {
+            $(inputEl).next('.custom-file-label').html('<i class="fas fa-spinner fa-spin text-warning"></i> Sıkıştırılıyor...');
+            compressImage(file, function(compressedFile) {
+                try {
+                    const dt = new DataTransfer();
+                    dt.items.add(compressedFile);
+                    inputEl.files = dt.files;
+                    $(inputEl).next('.custom-file-label').addClass("selected").html(compressedFile.name + ' (Sıkıştırıldı)');
+                } catch (err) {
+                    console.error('DataTransfer failed:', err);
+                    $(inputEl).next('.custom-file-label').addClass("selected").html(file.name);
+                }
+            });
+        } else {
+            let fileName = '';
+            if (e.target.files && e.target.files.length > 1) {
+                fileName = e.target.files.length + ' dosya seçildi';
+            } else {
+                fileName = $(this).val().split('\\').pop(); 
+            }
+            $(this).next('.custom-file-label').addClass("selected").html(fileName); 
+        }
+    });
+
+    // --- Coklu Karat Secenekleri JS Yardimcilari ---
+    function addCaratOptionRow(container, carat = '', price = '') {
+        const row = document.createElement('div');
+        row.className = 'row align-items-center mb-2 carat-option-row';
+        row.innerHTML = `
+            <div class="col-md-5">
+                <div class="input-group input-group-sm">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text bg-light border-right-0">ct</span>
+                    </div>
+                    <input type="number" name="caratOptionsCarats" class="form-control border-left-0" placeholder="Karat orn: 1.08" step="0.01" min="0" value="${carat}" required style="border-radius:0 4px 4px 0;">
+                </div>
+            </div>
+            <div class="col-md-5">
+                <div class="input-group input-group-sm">
+                    <input type="text" name="caratOptionsPrices" class="form-control price-input" placeholder="Fiyat orn: 29.990" value="${price}" required>
+                    <div class="input-group-append">
+                        <span class="input-group-text bg-light">TL</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2 text-right">
+                <button type="button" class="btn btn-sm btn-danger remove-carat-row-btn" style="border-radius:4px; padding: 4px 10px;">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
+            </div>
+        `;
+        
+        // Silme islemi icin event listener
+        row.querySelector('.remove-carat-row-btn').addEventListener('click', function() {
+            row.remove();
+        });
+
+        // Fiyat girisi icin otomatik binlik ayirici (istege bagli, ama serbest girilebilinsin)
+        // Kullanici herhangi bir fiyat girebilir ("istenilen fiyat yazilabilinsin her fiyat")
+        
+        container.appendChild(row);
+    }
+
+    // Buton dinleyicileri
+    document.getElementById('addCaratOptionBtn').addEventListener('click', function() {
+        const container = document.getElementById('caratOptionsContainer');
+        addCaratOptionRow(container);
+    });
+
+    document.getElementById('editAddCaratOptionBtn').addEventListener('click', function() {
+        const container = document.getElementById('editCaratOptionsContainer');
+        addCaratOptionRow(container);
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,100 @@
+<%- include('partials/head') %>
+    <%- include('partials/header') %>
+
+        <main>
+            <div class="slider-area ">
+                <div class="single-slider slider-height2 d-flex align-items-center">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-xl-12">
+                                <div class="hero-cap text-center">
+                                    <h2>PayTR Debug</h2>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <section class="section_padding">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-12">
+                            <div style="background: #d4edda; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                                <h3 style="color: #155724;">🎯 ANA SORUN: YÖNLENDİRME (REDIRECT)</h3>
+                                <p>PayTR'nin POST isteği yönlendirme sırasında GET'e dönüşüyor!</p>
+                            </div>
+
+                            <h3>📋 HEMEN YAPMANIZ GEREKENLER</h3>
+
+                            <div class="card mb-4">
+                                <div class="card-body">
+                                    <h4>ADIM 1: Doğru URL'yi Bulun</h4>
+                                    <p>Aşağıdaki her iki URL'yi de tarayıcınızda açın:</p>
+                                    <ol>
+                                        <li><a href="https://www.midiamond.com.tr/payment/callback"
+                                                target="_blank">https://www.midiamond.com.tr/payment/callback</a></li>
+                                        <li><a href="https://midiamond.com.tr/payment/callback"
+                                                target="_blank">https://midiamond.com.tr/payment/callback</a></li>
+                                    </ol>
+                                    <p><strong>HANGİSİNİ KULLANMALISINIZ?</strong> Hangisi tarayıcıda URL değişmeden
+                                        kalıyorsa (yönlendirme yapmıyorsa) onu kullanın!</p>
+                                </div>
+                            </div>
+
+                            <div class="card mb-4">
+                                <div class="card-body">
+                                    <h4>ADIM 2: PayTR Panelini Güncelleyin</h4>
+                                    <p>PayTR Mağaza Paneli → Ayarlar → Bildirim URL</p>
+                                    <p>URL'yi yukarıda bulduğunuz <strong>yönlendirme yapmayan URL</strong> olarak
+                                        ayarlayın.</p>
+                                </div>
+                            </div>
+
+                            <div class="card mb-4">
+                                <div class="card-body">
+                                    <h4>ADIM 3: Test Edin</h4>
+                                    <p>PayTR panelinde "Tekrar Kontrol Et" butonuna tıklayın.</p>
+                                </div>
+                            </div>
+
+                            <h3>Sistem Durumu</h3>
+                            <div class="card mb-4">
+                                <div class="card-body">
+                                    <p><strong>Sunucu Durumu:</strong>
+                                        <%= debugInfo.server_status %>
+                                    </p>
+                                    <p><strong>Zaman:</strong>
+                                        <%= debugInfo.timestamp %>
+                                    </p>
+                                    <p><strong>Callback Endpoint:</strong>
+                                        <%= debugInfo.endpoint %>
+                                    </p>
+                                </div>
+                            </div>
+
+                            <h3>Çevre Değişkenleri</h3>
+                            <div class="card mb-4">
+                                <div class="card-body">
+                                    <ul>
+                                        <li>PAYTR_MERCHANT_ID: <%= debugInfo.env_check.PAYTR_MERCHANT_ID %>
+                                        </li>
+                                        <li>PAYTR_MERCHANT_KEY: <%= debugInfo.env_check.PAYTR_MERCHANT_KEY %>
+                                        </li>
+                                        <li>PAYTR_MERCHANT_SALT: <%= debugInfo.env_check.PAYTR_MERCHANT_SALT %>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="mt-4 text-center">
+                                <a href="/payment/test" class="btn_1">Test Endpoint'ini Aç</a>
+                                <a href="/" class="btn_3">Ana Sayfaya Dön</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <%- include('partials/footer') %>

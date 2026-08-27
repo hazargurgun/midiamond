@@ -1,0 +1,30 @@
+<%- include('partials/head') %>
+<%- include('partials/header') %>
+
+<main>
+    <div class="slider-area ">
+        <div class="single-slider slider-height2 d-flex align-items-center">
+            <div class="container">
+                <div class="row">
+                    <div class="col-xl-12">
+                        <div class="hero-cap text-center">
+                            <h2>Ödeme Başarısız</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section class="section_padding">
+        <div class="container text-center">
+            <i class="fas fa-times-circle text-danger" style="font-size: 100px; margin-bottom: 20px;"></i>
+            <h2 class="text-danger">Ödeme İşlemi Başarısız Oldu</h2>
+            <p class="mt-3">Banka kartınızdan veya hesabınızdan herhangi bir çekim yapılmadı. Lütfen bilgilerinizi kontrol edip tekrar deneyin.</p>
+            <a href="/checkout" class="btn_3 mt-4">Tekrar Dene</a>
+            <a href="/cart" class="btn_1 mt-4">Sepetime Dön</a>
+        </div>
+    </section>
+</main>
+
+<%- include('partials/footer') %>

@@ -1,0 +1,513 @@
+<style>
+    .custom-header {
+        font-family: 'Inter', 'Roboto', sans-serif;
+        background-color: transparent;
+    }
+    .custom-header .container-fluid {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 15px;
+    }
+    .header-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 20px 0;
+    }
+    .header-logo {
+        position: relative;
+        width: 220px;
+        height: 60px;
+    }
+    .header-logo img {
+        position: absolute;
+        top: -30px;
+        left: 0;
+        height: 270px;
+        width: auto;
+        max-width: 350px;
+        object-fit: contain;
+        z-index: 1050;
+    }
+    .header-search {
+        flex: 1;
+        max-width: 600px;
+        margin: 0 30px;
+        position: relative;
+    }
+    .header-search input {
+        width: 100%;
+        padding: 12px 45px 12px 20px;
+        border: 1px solid #e0e0e0;
+        border-radius: 4px;
+        font-size: 14px;
+        color: #555;
+        outline: none;
+    }
+    .header-search input::placeholder {
+        color: #999;
+    }
+    .header-search button {
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: transparent;
+        border: none;
+        color: #2a4066;
+        font-size: 18px;
+        cursor: pointer;
+    }
+    .header-icons {
+        display: flex;
+        align-items: center;
+        gap: 25px;
+    }
+    .header-icons a {
+        color: #2a4066;
+        font-size: 24px;
+        position: relative;
+        text-decoration: none;
+    }
+    .header-icons a .badge {
+        position: absolute;
+        top: -6px;
+        right: -10px;
+        background-color: #d9534f;
+        color: white;
+        border-radius: 50%;
+        font-size: 11px;
+        padding: 4px 6px;
+        font-family: sans-serif;
+    }
+    .header-middle {
+        padding: 15px 0;
+    }
+    .header-nav {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 28px;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+    .header-nav a {
+        color: #2a4066;
+        font-size: 14px;
+        font-weight: 500;
+        text-decoration: none;
+    }
+    .header-nav a:hover {
+        color: #0056b3;
+    }
+    .header-bottom {
+        background-color: transparent;
+        padding: 10px 0;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    .header-promo-nav {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 30px;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+    .header-promo-nav a {
+        color: #b94a48;
+        font-size: 13px;
+        font-weight: 500;
+        text-decoration: none;
+    }
+    .header-promo-nav a.text-dark {
+        color: #555;
+    }
+    .header-promo-nav a:hover {
+        text-decoration: underline;
+    }
+    
+    /* Mobile styles */
+    @media (max-width: 991px) {
+        .header-top {
+            display: none !important;
+        }
+        .header-middle, .header-bottom {
+            display: none;
+        }
+        .mobile_menu {
+            position: relative;
+            margin-top: 0;
+            min-height: 0;
+        }
+        .mobile_menu .slicknav_menu {
+            padding: 0;
+            background: transparent;
+        }
+        .mobile_menu .slicknav_btn {
+            display: none !important; /* Hide default slicknav button */
+        }
+        .mobile_menu .slicknav_nav {
+            margin-top: 5px !important;
+            padding: 8px 0;
+            border-radius: 12px;
+            background: #fff;
+            border: 1px solid #e5e5e5;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            position: absolute;
+            width: 100%;
+            left: 0;
+            z-index: 1000;
+        }
+        .mobile_menu .slicknav_nav a {
+            padding: 12px 18px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #2a4066;
+            transition: all 0.2s ease;
+        }
+        .mobile_menu .slicknav_nav a:hover {
+            background-color: #fcf9f2;
+            color: #c49b45;
+        }
+        
+        /* Premium Balanced Mobile Header Top */
+        .mobile-header-top {
+            display: flex !important;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 0;
+            background-color: #ffffff;
+            position: relative;
+        }
+        
+        .mobile-header-left,
+        .mobile-header-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            width: 90px; /* Constrain width to ensure perfect logo centering */
+        }
+        
+        .mobile-header-left {
+            justify-content: flex-start;
+        }
+        
+        .mobile-header-right {
+            justify-content: flex-end;
+        }
+        
+        .mobile-menu-btn,
+        .mobile-search-btn,
+        .mobile-icon-link {
+            background: transparent;
+            border: none;
+            color: #2a4066;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 4px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            position: relative;
+            transition: color 0.2s ease;
+        }
+        
+        .mobile-menu-btn:hover,
+        .mobile-search-btn:hover,
+        .mobile-icon-link:hover {
+            color: #c49b45;
+        }
+        
+        .mobile-cart-badge {
+            position: absolute;
+            top: -4px;
+            right: -8px;
+            background-color: #d9534f;
+            color: white;
+            border-radius: 50%;
+            font-size: 10px;
+            padding: 2px 5px;
+            font-family: sans-serif;
+            font-weight: 600;
+            line-height: 1;
+        }
+        
+        .mobile-header-center {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .mobile-logo-link {
+            display: block;
+            height: 46px;
+            width: 130px;
+            position: relative;
+        }
+        
+        .mobile-logo-link img {
+            height: 130px;
+            width: auto;
+            position: absolute;
+            top: -42px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1060;
+            object-fit: contain;
+        }
+        
+        /* Collapsible Mobile Search Wrapper */
+        .mobile-search-wrapper {
+            padding: 12px 15px;
+            border-top: 1px solid #f5f5f5;
+            border-bottom: 1px solid #f5f5f5;
+            background-color: #ffffff;
+            margin: 0 -15px; /* Bleed to full width inside padded container */
+            animation: slideDown 0.3s ease-out forwards;
+        }
+        
+    }
+</style>
+
+<header class="custom-header">
+    <div class="container-fluid">
+        <!-- Top Row -->
+        <div class="header-top d-none d-lg-flex">
+            <div class="header-logo">
+                <a href="/">
+                    <img src="/assets/img/logo/custom_logo_v2.png" alt="Logo">
+                </a>
+            </div>
+            
+            <div class="header-search">
+                <form action="/shop" method="GET">
+                    <input type="text" name="q" placeholder="Ürün kodu ya da ürün adı yazınız">
+                    <button type="submit"><i class="ti-search"></i></button>
+                </form>
+            </div>
+            
+            <div class="header-icons">
+                <a href="<%= user ? '/user/profile' : '/auth/login' %>" title="<%= user ? 'Hesabım' : 'Giriş Yap' %>">
+                    <i class="far fa-user"></i>
+                </a>
+                <a href="/user/favorites" title="Favorilerim">
+                    <i class="far fa-heart"></i>
+                </a>
+                <a href="/cart" title="Sepetim">
+                    <i class="fas fa-shopping-bag"></i>
+                    <span class="badge" id="cart-count"><%= locals.cartCount || 0 %></span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Premium Balanced Mobile Header Top (Visible on Mobile/Tablet only) -->
+        <div class="mobile-header-top d-flex d-lg-none">
+            <!-- Left Side: Hamburger & Search Button -->
+            <div class="mobile-header-left">
+                <button type="button" class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Menü">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <button type="button" class="mobile-search-btn" id="mobileSearchBtn" aria-label="Arama">
+                    <i class="ti-search"></i>
+                </button>
+            </div>
+            
+            <!-- Center: Logo -->
+            <div class="mobile-header-center">
+                <a href="/" class="mobile-logo-link">
+                    <img src="/assets/img/logo/custom_logo_v2.png" alt="Logo">
+                </a>
+            </div>
+            
+            <!-- Right Side: Profile & Cart -->
+            <div class="mobile-header-right">
+                <a href="<%= user ? '/user/profile' : '/auth/login' %>" class="mobile-icon-link" aria-label="Profil">
+                    <i class="far fa-user"></i>
+                </a>
+                <a href="/cart" class="mobile-icon-link mobile-cart-link" aria-label="Sepet">
+                    <i class="fas fa-shopping-bag"></i>
+                    <span class="mobile-cart-badge" id="mobileCartCount"><%= locals.cartCount || 0 %></span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Collapsible Mobile Search Wrapper -->
+        <div class="mobile-search-wrapper" id="mobileSearchWrapper" style="display: none;">
+            <form action="/shop" method="GET" class="mobile-search-form">
+                <input type="text" name="q" placeholder="Ürün kodu ya da ürün adı yazınız...">
+                <button type="submit"><i class="ti-search"></i></button>
+            </form>
+        </div>
+        
+        <!-- Mobile Menu Placeholder for Slicknav -->
+        <div class="col-12">
+            <div class="mobile_menu d-block d-lg-none"></div>
+        </div>
+    </div>
+
+    <!-- Middle Row (Categories) -->
+    <div class="header-middle d-none d-lg-block">
+        <div class="container-fluid">
+            <ul class="header-nav">
+                <% if (locals.globalCategories && locals.globalCategories.length > 0) { %>
+                    <% globalCategories.forEach(category => { %>
+                        <li><a href="/shop?category=<%= category.slug %>"><%= category.name %></a></li>
+                    <% }); %>
+                <% } else { %>
+                    <!-- Fallback -->
+                    <li><a href="/shop">Mağaza</a></li>
+                <% } %>
+                
+                <li><a href="/yuzuk-olcusu-bulma" style="color: #c49b45; font-weight: bold;"><i class="fas fa-gem"></i> Ölçü Bulucu</a></li>
+
+                <% if (user && user.role === 'admin') { %>
+                    <li><a href="/admin" style="color: #d9534f; font-weight: bold;">Admin Paneli</a></li>
+                <% } %>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Bottom Row (Promotions) -->
+    <div class="header-bottom d-none d-lg-block">
+        <div class="container-fluid">
+            <ul class="header-promo-nav">
+                <% const promoSetting = typeof globalSetting !== 'undefined' ? globalSetting : {}; %>
+                <% if (promoSetting.promoNav1Label) { %>
+                <li><a href="<%= promoSetting.promoNav1Category ? '/shop?category=' + promoSetting.promoNav1Category : '/shop' %>"><%= promoSetting.promoNav1Label %></a></li>
+                <% } %>
+                <% if (promoSetting.promoNav2Label) { %>
+                <li><a href="<%= promoSetting.promoNav2Category ? '/shop?category=' + promoSetting.promoNav2Category : '/shop' %>" class="text-dark"><%= promoSetting.promoNav2Label %></a></li>
+                <% } %>
+                <% if (promoSetting.promoNav3Label) { %>
+                <li><a href="<%= promoSetting.promoNav3Category ? '/shop?category=' + promoSetting.promoNav3Category : '/shop' %>" class="text-dark"><%= promoSetting.promoNav3Label %></a></li>
+                <% } %>
+                <% if (promoSetting.promoNav4Label) { %>
+                <li><a href="<%= promoSetting.promoNav4Category ? '/shop?category=' + promoSetting.promoNav4Category : '/shop' %>" class="text-dark"><%= promoSetting.promoNav4Label %></a></li>
+                <% } %>
+                <% if (promoSetting.promoNav5Label) { %>
+                <li><a href="<%= promoSetting.promoNav5Category ? '/shop?category=' + promoSetting.promoNav5Category : '/shop' %>" class="text-dark"><%= promoSetting.promoNav5Label %></a></li>
+                <% } %>
+                <% if (!promoSetting.promoNav1Label) { %>
+                <li><a href="/shop">Pırlanta Fırsatları Net %50 İndirim</a></li>
+                <li><a href="/shop" class="text-dark">Çok Satanlar</a></li>
+                <li><a href="/shop" class="text-dark">Hızlı Kargo</a></li>
+                <li><a href="/shop" class="text-dark">Hediye Önerileri</a></li>
+                <li><a href="/shop" class="text-dark">Online Özel</a></li>
+                <% } %>
+            </ul>
+        </div>
+    </div>
+</header>
+
+<!-- Hidden nav for Slicknav to build mobile menu -->
+<div class="d-none">
+    <ul id="navigation">
+        <li><a href="/">Ana Sayfa</a></li> 
+        <li><a href="/shop">Mağaza</a></li>
+        <% if (locals.globalCategories && locals.globalCategories.length > 0) { %>
+            <% globalCategories.forEach(category => { %>
+                <li><a href="/shop?category=<%= category.slug %>"><%= category.name %></a></li>
+            <% }); %>
+        <% } %>
+        <li><a href="/yuzuk-olcusu-bulma">Yüzük Ölçüsü Hesaplama</a></li>
+        <li><a href="/about">Hakkımızda</a></li>
+        <li><a href="/contact">İletişim</a></li>
+        <li><a href="<%= user ? '/user/profile' : '/auth/login' %>"><%= user ? 'Hesabım' : 'Giriş Yap / Kayıt Ol' %></a></li>
+        <li><a href="/user/favorites">Favorilerim</a></li>
+        <% if (user && user.role === 'admin') { %>
+            <li><a href="/admin">Admin Paneli</a></li>
+        <% } %>
+    </ul>
+</div>
+
+<!-- Mobile Interaction Logic -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 1. Mobile Search Box Toggle Logic
+    const searchBtn = document.getElementById('mobileSearchBtn');
+    const searchWrapper = document.getElementById('mobileSearchWrapper');
+    
+    if (searchBtn && searchWrapper) {
+        searchBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            // Check if Slicknav menu is currently open, close it if so
+            const nav = $('ul#navigation');
+            if (nav.length && typeof nav.slicknav === 'function' && nav.slicknav('isOpen')) {
+                nav.slicknav('close');
+                const menuIcon = document.querySelector('#mobileMenuBtn i');
+                if (menuIcon) {
+                    menuIcon.className = 'fas fa-bars';
+                }
+            }
+            
+            if (searchWrapper.style.display === 'none') {
+                $(searchWrapper).slideDown(250);
+                searchBtn.innerHTML = '<i class="fas fa-times"></i>'; // Turn to sleek "X" close icon
+                searchBtn.style.color = '#d9534f'; // Make it red to indicate cancel
+                
+                // Focus on search input immediately for premium UX
+                setTimeout(() => {
+                    const input = searchWrapper.querySelector('input');
+                    if (input) input.focus();
+                }, 260);
+            } else {
+                $(searchWrapper).slideUp(180);
+                searchBtn.innerHTML = '<i class="ti-search"></i>'; // Reset to original magnifying glass
+                searchBtn.style.color = ''; // Reset color
+            }
+        });
+    }
+
+    // 2. Custom Mobile Menu (Slicknav Wrapper) Toggle Logic
+    const menuBtn = document.getElementById('mobileMenuBtn');
+    if (menuBtn) {
+        menuBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            // Check if Search Box is currently open, close it if so
+            if (searchWrapper && searchWrapper.style.display !== 'none') {
+                $(searchWrapper).slideUp(180);
+                if (searchBtn) {
+                    searchBtn.innerHTML = '<i class="ti-search"></i>';
+                    searchBtn.style.color = '';
+                }
+            }
+            
+            const nav = $('ul#navigation');
+            if (nav.length && typeof nav.slicknav === 'function') {
+                nav.slicknav('toggle');
+                
+                const icon = menuBtn.querySelector('i');
+                if (icon) {
+                    if (icon.classList.contains('fa-bars')) {
+                        icon.className = 'fas fa-times'; // Switch to clean close icon instantly
+                    } else {
+                        icon.className = 'fas fa-bars'; // Switch back to original hamburger icon instantly
+                    }
+                }
+            }
+        });
+    }
+    
+    // Close dropdowns if user clicks outside of header elements
+    document.addEventListener('click', function(event) {
+        const header = document.querySelector('.custom-header');
+        if (header && !header.contains(event.target)) {
+            if (searchWrapper && searchWrapper.style.display !== 'none') {
+                $(searchWrapper).slideUp(180);
+                if (searchBtn) {
+                    searchBtn.innerHTML = '<i class="ti-search"></i>';
+                    searchBtn.style.color = '';
+                }
+            }
+        }
+    });
+});
+</script>

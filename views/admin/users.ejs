@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kullanıcı Yönetimi | Admin Paneli</title>
+    <link rel="stylesheet" href="/assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/assets/css/fontawesome-all.min.css">
+    <style>
+        body { font-family: 'Poppins', sans-serif; background-color: #f8f9fa; }
+        .sidebar { min-height: 100vh; background: #2c3e50; color: white; padding-top: 20px; }
+        .sidebar a { color: #bdc3c7; display: block; padding: 15px; text-decoration: none; transition: 0.3s; }
+        .sidebar a:hover, .sidebar a.active { background: #34495e; color: white; border-left: 4px solid #d4af37; }
+        .main-content { padding: 30px; }
+        .gold-text { color: #d4af37; }
+    </style>
+</head>
+<body>
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-2 sidebar">
+            <h4 class="text-center gold-text mb-4">MI DIAMOND ADMIN</h4>
+            <a href="/admin"><i class="fas fa-tachometer-alt mr-2"></i> Dashboard</a>
+            <a href="/admin/home-settings"><i class="fas fa-home mr-2"></i> Ana Sayfa Yönetimi</a>
+            <a href="/admin/products"><i class="fas fa-gem mr-2"></i> Ürünler</a>
+            <a href="/admin/categories"><i class="fas fa-list mr-2"></i> Kategoriler</a>
+            <a href="/admin/orders"><i class="fas fa-shopping-cart mr-2"></i> Siparişler</a>
+            <a href="/admin/users" class="active"><i class="fas fa-users mr-2"></i> Kullanıcılar</a>
+            <a href="/admin/support"><i class="fas fa-comments mr-2"></i> Canlı Destek</a>
+            <a href="/admin/banners"><i class="fas fa-image mr-2"></i> Bannerlar</a>
+            <a href="/"><i class="fas fa-external-link-alt mr-2"></i> Siteye Git</a>
+            <a href="/auth/logout" class="mt-5 text-danger"><i class="fas fa-sign-out-alt mr-2"></i> Çıkış Yap</a>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-md-10 main-content">
+            <h2 class="mb-4">Kullanıcı Yönetimi</h2>
+            
+            <div class="card border-none shadow-sm">
+                <div class="card-body">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Ad Soyad</th>
+                                <th>E-posta</th>
+                                <th>Rol</th>
+                                <th>Kayıt Tarihi</th>
+                                <th>İşlemler</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% users.forEach(user => { %>
+                                <tr>
+                                    <td><%= user.name %></td>
+                                    <td><%= user.email %></td>
+                                    <td><span class="badge badge-<%= user.role === 'admin' ? 'danger' : 'primary' %>"><%= user.role %></span></td>
+                                    <td><%= user.createdAt.toLocaleDateString('tr-TR') %></td>
+                                    <td>
+                                        <% if (user.role !== 'admin') { %>
+                                            <a href="/admin/users/delete/<%= user._id %>" class="btn btn-sm btn-danger" onclick="return confirm('Silmek istediğinize emin misiniz?')"><i class="fas fa-trash"></i></a>
+                                        <% } %>
+                                    </td>
+                                </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/assets/js/vendor/jquery-1.12.4.min.js"></script>
+<script src="/assets/js/bootstrap.min.js"></script>
+</body>
+</html>

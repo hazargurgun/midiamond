@@ -1,0 +1,502 @@
+<%- include('partials/head') %>
+<% if (typeof embed === 'undefined' || !embed) { %>
+<%- include('partials/header') %>
+<% } %>
+
+<main>
+    <!-- Hero Area Start-->
+    <% if (typeof embed === 'undefined' || !embed) { %>
+    <div class="slider-area ">
+        <div class="single-slider slider-height2 d-flex align-items-center">
+            <div class="container">
+                <div class="row">
+                    <div class="col-xl-12">
+                        <div class="hero-cap text-center">
+                            <h2>Yüzük Ölçü Bulucu</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <% } %>
+
+    <!-- Finder Section Start -->
+    <section class="ring-size-section section_padding" style="background-color: #ffffff; padding: <%= (typeof embed !== 'undefined' && embed) ? '0px 0' : '60px 0 100px' %>;">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-10 text-center mb-4">
+                    <div class="section-tittle text-center">
+                        <div style="margin-bottom: 20px;">
+                            <img src="/assets/img/logo/custom_logo_v2.png" alt="Logo" style="max-height: 55px; object-fit: contain;">
+                        </div>
+                        <h2>1 TL ile Yüzük Ölçüsü Hesaplama</h2>
+                    </div>
+                    <p style="font-size: 15px; color: #777; max-width: 700px; margin: 15px auto 0; line-height: 1.6; font-family: 'Inter', sans-serif;">
+                        Markamıza özel interaktif kalibrasyon aracı sayesinde, ekranınızın boyutuna göre %100 hassasiyetle yüzük ölçünüzü anında hesaplayabilirsiniz.
+                    </p>
+                </div>
+            </div>
+
+            <div class="row justify-content-center">
+                <div class="col-lg-8 col-md-10">
+                    <div class="yuzuk-olcer-card" style="background: #ffffff; border-radius: 24px; box-shadow: 0 15px 40px rgba(0,0,0,0.06); padding: 35px 30px; border: 1px solid #ede8df; min-height: 580px; display: flex; flex-direction: column; justify-content: space-between; position: relative;">
+                        
+                        <!-- Step Indicator -->
+                        <div class="wizard-steps" style="display: flex; justify-content: space-between; margin-bottom: 30px; position: relative; z-index: 2;">
+                            <div class="step-item active" id="step-dot-1" style="flex: 1; text-align: center; font-size: 13px; font-weight: 700; color: #c5a059;">
+                                <div class="step-num" style="width: 32px; height: 32px; border-radius: 50%; background: #c5a059; color: #fff; display: flex; align-items: center; justify-content: center; margin: 0 auto 8px; font-weight: bold; box-shadow: 0 4px 10px rgba(197, 160, 89, 0.3);">1</div>
+                                Giriş
+                            </div>
+                            <div class="step-item" id="step-dot-2" style="flex: 1; text-align: center; font-size: 13px; font-weight: 500; color: #aaa;">
+                                <div class="step-num" style="width: 32px; height: 32px; border-radius: 50%; background: #eee; color: #888; display: flex; align-items: center; justify-content: center; margin: 0 auto 8px; font-weight: bold;">2</div>
+                                Kalibrasyon
+                            </div>
+                            <div class="step-item" id="step-dot-3" style="flex: 1; text-align: center; font-size: 13px; font-weight: 500; color: #aaa;">
+                                <div class="step-num" style="width: 32px; height: 32px; border-radius: 50%; background: #eee; color: #888; display: flex; align-items: center; justify-content: center; margin: 0 auto 8px; font-weight: bold;">3</div>
+                                Ölçüm
+                            </div>
+                        </div>
+
+                        <!-- Step Content 1: Welcome -->
+                        <div id="step-content-1" class="step-content" style="text-align: center; margin-bottom: 20px;">
+                            <div style="font-size: 60px; color: #c5a059; margin-bottom: 20px;"><i class="fas fa-magic"></i></div>
+                            <h3 style="font-size: 20px; font-weight: 700; color: #140C40; margin-bottom: 15px; font-family: 'Montserrat', sans-serif;">Ölçünüzü Bulmak Çok Kolay!</h3>
+                            <p style="font-size: 14px; color: #666; line-height: 1.7; margin-bottom: 25px; max-width: 500px; margin-left: auto; margin-right: auto;">
+                                Yüzük ölçünüzü tam olarak tespit etmek için elinizde **fiziksel bir 1 TL madeni para** olması yeterlidir. Ekranınızı 1 TL ile kalibre ederek yüzüklerinizin iç çapını milimetrik hassasiyetle ölçeceğiz.
+                            </p>
+                            <div style="background: #fdfaf4; border-radius: 12px; padding: 15px; border: 1px solid #f6ecdb; max-width: 450px; margin: 0 auto 30px; text-align: left; font-size: 13px; color: #8c7340; line-height: 1.5;">
+                                <i class="fas fa-info-circle" style="margin-right: 8px; font-size: 15px; vertical-align: middle;"></i> <strong>Nasıl Çalışır?</strong> Her ekranın piksel yoğunluğu farklıdır. 1 TL madeni paranın sabit olan <strong>26.15 mm</strong> çapını ekranda eşleyerek cihazınızın piksel ölçeğini tanımlarız.
+                            </div>
+                            <button type="button" class="btn-premium-primary" onclick="goToStep(2)" style="max-width: 250px; margin: 0 auto; display: block; border-radius: 30px;">Hemen Başla</button>
+                        </div>
+
+                        <!-- Step Content 2: Calibration -->
+                        <div id="step-content-2" class="step-content" style="display: none; text-align: center;">
+                            <h3 style="font-size: 18px; font-weight: 700; color: #140C40; margin-bottom: 10px; font-family: 'Montserrat', sans-serif;">Ekran Kalibrasyonu</h3>
+                            <p style="font-size: 13px; color: #666; line-height: 1.5; margin-bottom: 25px; max-width: 520px; margin-left: auto; margin-right: auto;">
+                                Ekranın üzerine fiziksel bir **1 TL** yerleştirin. Aşağıdaki kaydırıcıyı kullanarak ekrandaki daireyi **1 TL madeni para ile birebir aynı boyuta** getirin.
+                            </p>
+
+                            <!-- Calibration Interactive Area -->
+                            <div style="height: 180px; display: flex; align-items: center; justify-content: center; margin-bottom: 30px; position: relative;">
+                                <div id="calibration-circle" style="width: 240px; height: 240px; border-radius: 50%; background: radial-gradient(circle, rgba(197, 160, 89, 0.15) 0%, rgba(197, 160, 89, 0.45) 100%); border: 3px dashed #c5a059; transition: width 0.05s ease, height 0.05s ease; box-shadow: 0 10px 30px rgba(197,160,89,0.2); display: flex; align-items: center; justify-content: center;">
+                                    <div style="font-size: 11px; font-weight: 700; color: #8c7340; text-shadow: 0 1px 1px #fff; text-transform: uppercase; letter-spacing: 0.5px;">1 TL Koyun</div>
+                                </div>
+                            </div>
+
+                            <!-- Slider & Fine Tuning Buttons -->
+                            <div style="max-width: 450px; margin: 0 auto 25px;">
+                                <div style="display: flex; align-items: center; justify-content: space-between; gap: 15px; margin-bottom: 10px;">
+                                    <button type="button" class="btn-tune" onclick="tuneCalibration(-1)" style="width:36px; height:36px; border-radius:50%; border:1px solid #ccc; background:#fff; font-size:18px; font-weight:bold; color:#555; cursor:pointer; outline:none; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 5px rgba(0,0,0,0.05);">-</button>
+                                    <input type="range" id="calibration-slider" min="150" max="350" value="240" oninput="resizeCalibrationCircle(this.value)" style="flex:1; height:6px; border-radius:5px; background:#e4cc95; outline:none; -webkit-appearance:none; cursor:pointer;">
+                                    <button type="button" class="btn-tune" onclick="tuneCalibration(1)" style="width:36px; height:36px; border-radius:50%; border:1px solid #ccc; background:#fff; font-size:18px; font-weight:bold; color:#555; cursor:pointer; outline:none; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 5px rgba(0,0,0,0.05);">+</button>
+                                </div>
+                                <span id="cal-pixels-label" style="font-size: 12px; color: #999; font-family: monospace;">Genişlik: 240px</span>
+                            </div>
+
+                            <div style="display: flex; gap: 15px; max-width: 400px; margin: 0 auto;">
+                                <button type="button" class="btn-premium-secondary" onclick="goToStep(1)" style="border-radius:30px; padding: 12px 24px;">Geri Git</button>
+                                <button type="button" class="btn-premium-primary" onclick="saveCalibrationAndContinue()" style="border-radius:30px; padding: 12px 24px;">Kalibrasyonu Tamamla</button>
+                            </div>
+                        </div>
+
+                        <!-- Step Content 3: Measurement -->
+                        <div id="step-content-3" class="step-content" style="display: none; text-align: center;">
+                            <h3 style="font-size: 18px; font-weight: 700; color: #140C40; margin-bottom: 15px; font-family: 'Montserrat', sans-serif;">Yüzük Ölçümü Yapın</h3>
+                            
+                            <!-- Measurement Mode Tabs -->
+                            <div style="display: flex; justify-content: center; gap: 10px; margin-bottom: 25px;">
+                                <button type="button" id="tab-btn-ring" class="measure-tab-btn active" onclick="switchMeasureMode('ring')" style="padding:8px 18px; font-size:12px; font-weight:700; border-radius:20px; border:1px solid #c5a059; background:#c5a059; color:#fff; cursor:pointer; outline:none; transition: all 0.3s;">Mevcut Yüzük ile Ölç</button>
+                                <button type="button" id="tab-btn-circles" class="measure-tab-btn" onclick="switchMeasureMode('circles')" style="padding:8px 18px; font-size:12px; font-weight:700; border-radius:20px; border:1px solid #ccc; background:#fff; color:#555; cursor:pointer; outline:none; transition: all 0.3s;">Ölçü Seçip Karşılaştır</button>
+                            </div>
+
+                            <!-- Mode A: Measure Existing Ring -->
+                            <div id="mode-content-ring" style="display: block;">
+                                <p style="font-size: 13px; color: #666; line-height: 1.5; margin-bottom: 20px; max-width: 500px; margin-left: auto; margin-right: auto;">
+                                    Yüzüğünüzü ekranın ortasındaki dairenin üzerine koyun. Aşağıdaki kaydırıcıyla daireyi yüzüğünüzün **iç metal kenarlarıyla** birebir hizalayın.
+                                </p>
+
+                                <!-- Ring Interactive Circle Area -->
+                                <div style="height: 180px; display: flex; align-items: center; justify-content: center; margin-bottom: 25px; position: relative;">
+                                    <div id="ring-measure-circle" style="width: 160px; height: 160px; border-radius: 50%; border: 2.5px solid #140C40; background: transparent; transition: width 0.05s ease, height 0.05s ease; box-shadow: 0 0 15px rgba(20, 12, 64, 0.15); display: flex; align-items: center; justify-content: center;">
+                                        <div style="width: 100%; height: 100%; border-radius: 50%; border: 1px dashed #c5a059; opacity: 0.8;"></div>
+                                    </div>
+                                </div>
+
+                                <!-- Result Display Box -->
+                                <div style="background: #fcf9f2; border: 1px solid #e4cc95; border-radius: 16px; padding: 15px; max-width: 400px; margin: 0 auto 20px; display: flex; align-items: center; justify-content: space-between;">
+                                    <div style="text-align: left;">
+                                        <span style="font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 0.5px; font-weight: bold;">Tahmini Ölçünüz</span>
+                                        <h4 style="font-size: 26px; font-weight: 800; color: #c5a059; margin: 0;" id="ring-size-result-label">15</h4>
+                                    </div>
+                                    <div style="text-align: right; border-left: 1px solid #ede8df; padding-left: 15px;">
+                                        <span style="font-size: 11px; color: #888; display: block; font-weight: 600;">İç Çap</span>
+                                        <span style="font-size: 14px; font-weight: 700; color: #140C40;" id="ring-diameter-result-label">17.52 mm</span>
+                                    </div>
+                                </div>
+
+                                <!-- Ring Slider & Fine Tuning Buttons -->
+                                <div style="max-width: 450px; margin: 0 auto 25px;">
+                                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 15px;">
+                                        <button type="button" class="btn-tune" onclick="tuneRingMeasure(-1)" style="width:36px; height:36px; border-radius:50%; border:1px solid #ccc; background:#fff; font-size:18px; font-weight:bold; color:#555; cursor:pointer; outline:none; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 5px rgba(0,0,0,0.05);">-</button>
+                                        <input type="range" id="ring-measure-slider" min="100" max="250" value="160" oninput="resizeRingMeasureCircle(this.value)" style="flex:1; height:6px; border-radius:5px; background:#c5a059; outline:none; -webkit-appearance:none; cursor:pointer;">
+                                        <button type="button" class="btn-tune" onclick="tuneRingMeasure(1)" style="width:36px; height:36px; border-radius:50%; border:1px solid #ccc; background:#fff; font-size:18px; font-weight:bold; color:#555; cursor:pointer; outline:none; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 5px rgba(0,0,0,0.05);">+</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Mode B: Choose Size and Display -->
+                            <div id="mode-content-circles" style="display: none;">
+                                <p style="font-size: 13px; color: #666; line-height: 1.5; margin-bottom: 25px; max-width: 500px; margin-left: auto; margin-right: auto;">
+                                    Aşağıdan öğrenmek istediğiniz **yüzük ölçüsünü** seçin. Ekranda tam olarak o ölçünün birebir fiziksel boyutundaki daire çizilecektir.
+                                </p>
+
+                                <!-- Selection Dropdown -->
+                                <div style="max-width: 300px; margin: 0 auto 25px;">
+                                    <label style="display:block; font-size:12px; font-weight:700; color:#c5a059; text-transform:uppercase; margin-bottom:8px; text-align:left;">Ölçü Seçin</label>
+                                    <select id="size-comparator-select" onchange="updateComparatorSize(this.value)" style="width: 100%; padding: 12px; border: 1px solid #c5a059; border-radius: 8px; font-size: 14px; font-weight: 700; color: #140C40; outline: none; background: #fff; cursor: pointer; box-shadow: 0 4px 10px rgba(197, 155, 69, 0.05);">
+                                        <!-- Will be populated dynamically -->
+                                    </select>
+                                </div>
+
+                                <!-- Comparison Circle Area -->
+                                <div style="height: 160px; display: flex; align-items: center; justify-content: center; margin-bottom: 25px; position: relative;">
+                                    <div id="ring-compare-circle" style="width: 160px; height: 160px; border-radius: 50%; border: 3px solid #c5a059; background: radial-gradient(circle, rgba(197,160,89,0.05) 0%, rgba(197,160,89,0.15) 100%); display: flex; align-items: center; justify-content: center; transition: width 0.15s ease, height 0.15s ease;">
+                                        <div style="font-size: 18px; font-weight: 800; color: #140C40;" id="ring-compare-label">15</div>
+                                    </div>
+                                </div>
+                                
+                                <div style="margin-bottom: 20px;">
+                                    <span style="font-size: 13px; color: #888; font-weight: 600;">Seçilen Ölçü İç Çapı: <strong style="color:#140C40;" id="ring-compare-diameter-label">17.52 mm</strong></span>
+                                </div>
+                            </div>
+
+                            <!-- Premium Bilgilendirme ve Uyarı Kutusu -->
+                            <div style="background: #fafaf9; border: 1px solid #e5dfd5; border-radius: 14px; padding: 16px; margin: 20px auto; max-width: 480px; text-align: left; box-shadow: 0 4px 15px rgba(0,0,0,0.02); display: flex; align-items: flex-start; gap: 14px;">
+                                <img src="/assets/img/logo/custom_logo_v2.png" alt="MI DIAMOND" style="max-height: 28px; max-width: 55px; object-fit: contain; flex-shrink: 0; margin-top: 2px;">
+                                <div style="font-size: 11px; line-height: 1.6; color: #555; font-family: 'Inter', sans-serif;">
+                                    <strong>Önemli Bilgilendirme:</strong> Kalibrasyonu doğru yapıp uygun ölçüyü seçtiğinizde, sistem %95 doğrulukla yüzük ölçünüzü hesaplar.<br><br>
+                                    Emin değilseniz, <strong>"Yeniden Kalibre Et"</strong> butonuna basarak yeniden kalibrasyon yapabilirsiniz.<br><br>
+                                    Ölçüm yöntemi sistemde görüntülenemediğinden, olası hatalardan <strong>MI DIAMOND</strong> sorumlu değildir.
+                                </div>
+                            </div>
+
+                            <!-- Footer actions -->
+                            <div style="display: flex; gap: 15px; max-width: 400px; margin: 0 auto;">
+                                <button type="button" class="btn-premium-secondary" onclick="goToStep(2)" style="border-radius:30px; padding: 12px 24px;">Yeniden Kalibre Et</button>
+                                <a href="/shop" class="btn-premium-primary" style="border-radius:30px; padding: 12px 24px; text-decoration: none; display: flex; align-items: center; justify-content: center;">Mağazaya Git</a>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Finder Section End -->
+</main>
+
+<% if (typeof embed === 'undefined' || !embed) { %>
+<%- include('partials/footer') %>
+<% } else { %>
+</body>
+</html>
+<% } %>
+
+<script>
+// Jewelery Ring Size Chart Data ( Turkish standard sizing table)
+const ringSizeChart = [
+    { size: 7, diameter: 14.96 },
+    { size: 8, diameter: 15.28 },
+    { size: 9, diameter: 15.61 },
+    { size: 10, diameter: 15.92 },
+    { size: 11, diameter: 16.24 },
+    { size: 12, diameter: 16.56 },
+    { size: 13, diameter: 16.88 },
+    { size: 14, diameter: 17.20 },
+    { size: 15, diameter: 17.52 },
+    { size: 16, diameter: 17.83 },
+    { size: 17, diameter: 18.15 },
+    { size: 18, diameter: 18.47 },
+    { size: 19, diameter: 18.79 },
+    { size: 20, diameter: 19.11 },
+    { size: 21, diameter: 19.43 },
+    { size: 22, diameter: 19.75 },
+    { size: 23, diameter: 20.06 },
+    { size: 24, diameter: 20.38 },
+    { size: 25, diameter: 20.70 },
+    { size: 26, diameter: 21.02 },
+    { size: 27, diameter: 21.34 },
+    { size: 28, diameter: 21.66 },
+    { size: 29, diameter: 21.97 },
+    { size: 30, diameter: 22.29 }
+];
+
+// Physical constant: A standard 1 TL coin is exactly 26.15 mm in diameter
+const oneTLCoinDiameterMm = 26.15;
+
+// State Variables
+let currentStep = 1;
+let pxPerMm = 9.1778; // Fallback default scale factor (pixels per mm)
+let calibrationCirclePixels = 240;
+
+// Initialize components when DOM loaded
+document.addEventListener('DOMContentLoaded', function() {
+    // Populate select element for Step 3 comparator mode
+    const selectEl = document.getElementById('size-comparator-select');
+    if (selectEl) {
+        ringSizeChart.forEach(item => {
+            const option = document.createElement('option');
+            option.value = item.size;
+            option.text = `Ölçü ${item.size} (${item.diameter.toFixed(2)} mm)`;
+            if (item.size === 15) {
+                option.selected = true;
+            }
+            selectEl.appendChild(option);
+        });
+        
+        // Force jQuery niceSelect to rebuild with the new options
+        if (typeof $(selectEl).niceSelect === 'function') {
+            $(selectEl).niceSelect('update');
+        }
+    }
+});
+
+function goToStep(step) {
+    // Hide all step content
+    document.querySelectorAll('.step-content').forEach(el => el.style.display = 'none');
+    
+    // Show target content
+    document.getElementById(`step-content-${step}`).style.display = 'block';
+    
+    // Update step dots
+    document.querySelectorAll('.step-item').forEach((el, index) => {
+        const dotNum = index + 1;
+        const stepNumCircle = el.querySelector('.step-num');
+        
+        if (dotNum < step) {
+            // Completed step
+            el.className = 'step-item active';
+            el.style.color = '#c5a059';
+            if (stepNumCircle) {
+                stepNumCircle.style.background = '#28a745';
+                stepNumCircle.style.color = '#fff';
+                stepNumCircle.innerHTML = '<i class="fas fa-check"></i>';
+                stepNumCircle.style.boxShadow = '0 4px 10px rgba(40, 167, 69, 0.2)';
+            }
+        } else if (dotNum === step) {
+            // Active step
+            el.className = 'step-item active';
+            el.style.color = '#c5a059';
+            if (stepNumCircle) {
+                stepNumCircle.style.background = '#c5a059';
+                stepNumCircle.style.color = '#fff';
+                stepNumCircle.innerHTML = dotNum;
+                stepNumCircle.style.boxShadow = '0 4px 10px rgba(197, 160, 89, 0.3)';
+            }
+        } else {
+            // Inactive step
+            el.className = 'step-item';
+            el.style.color = '#aaa';
+            if (stepNumCircle) {
+                stepNumCircle.style.background = '#eee';
+                stepNumCircle.style.color = '#888';
+                stepNumCircle.innerHTML = dotNum;
+                stepNumCircle.style.boxShadow = 'none';
+            }
+        }
+    });
+
+    currentStep = step;
+    
+    // Load default values when entering Step 3
+    if (step === 3) {
+        // Compute default values inside Step 3 mode A
+        calculateRingSize(document.getElementById('ring-measure-slider').value);
+        // Compute default values inside Step 3 mode B
+        updateComparatorSize(document.getElementById('size-comparator-select').value);
+    }
+}
+
+// ----------------------------------------------------
+// STEP 2: Calibration Functions
+// ----------------------------------------------------
+function resizeCalibrationCircle(px) {
+    calibrationCirclePixels = parseInt(px);
+    const circle = document.getElementById('calibration-circle');
+    circle.style.width = px + 'px';
+    circle.style.height = px + 'px';
+    document.getElementById('cal-pixels-label').innerText = `Genişlik: ${px}px`;
+}
+
+function tuneCalibration(change) {
+    const slider = document.getElementById('calibration-slider');
+    let newVal = parseInt(slider.value) + change;
+    if (newVal >= parseInt(slider.min) && newVal <= parseInt(slider.max)) {
+        slider.value = newVal;
+        resizeCalibrationCircle(newVal);
+    }
+}
+
+function saveCalibrationAndContinue() {
+    // Compute scale ratio (pixels per mm)
+    // Formula: pxPerMm = (Circle Diameter in pixels) / (Physical 1 TL coin Diameter in mm)
+    pxPerMm = calibrationCirclePixels / oneTLCoinDiameterMm;
+    console.log(`Calibrated! Scale: ${pxPerMm.toFixed(4)} pixels per millimeter.`);
+    
+    // Go to final step
+    goToStep(3);
+}
+
+// ----------------------------------------------------
+// STEP 3: Measurement Functions
+// ----------------------------------------------------
+function switchMeasureMode(mode) {
+    document.querySelectorAll('.measure-tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+        btn.style.background = '#fff';
+        btn.style.color = '#555';
+        btn.style.borderColor = '#ccc';
+    });
+    
+    const activeBtn = document.getElementById(`tab-btn-${mode}`);
+    if (activeBtn) {
+        activeBtn.classList.add('active');
+        activeBtn.style.background = '#c5a059';
+        activeBtn.style.color = '#fff';
+        activeBtn.style.borderColor = '#c5a059';
+    }
+
+    document.getElementById('mode-content-ring').style.display = (mode === 'ring' ? 'block' : 'none');
+    document.getElementById('mode-content-circles').style.display = (mode === 'circles' ? 'block' : 'none');
+}
+
+// --- Mode A: Ring Slider resizing & matching ---
+function resizeRingMeasureCircle(px) {
+    const circle = document.getElementById('ring-measure-circle');
+    circle.style.width = px + 'px';
+    circle.style.height = px + 'px';
+    
+    calculateRingSize(px);
+}
+
+function tuneRingMeasure(change) {
+    const slider = document.getElementById('ring-measure-slider');
+    let newVal = parseInt(slider.value) + change;
+    if (newVal >= parseInt(slider.min) && newVal <= parseInt(slider.max)) {
+        slider.value = newVal;
+        resizeRingMeasureCircle(newVal);
+    }
+}
+
+function calculateRingSize(px) {
+    // 1. Calculate physical diameter in mm
+    const physicalDiameterMm = px / pxPerMm;
+    document.getElementById('ring-diameter-result-label').innerText = physicalDiameterMm.toFixed(2) + ' mm';
+    
+    // 2. Find the closest match in Turkish ring size chart
+    let closestMatch = ringSizeChart[0];
+    let minDifference = Math.abs(physicalDiameterMm - closestMatch.diameter);
+    
+    for (let i = 1; i < ringSizeChart.length; i++) {
+        let diff = Math.abs(physicalDiameterMm - ringSizeChart[i].diameter);
+        if (diff < minDifference) {
+            minDifference = diff;
+            closestMatch = ringSizeChart[i];
+        }
+    }
+    
+    // Update Result Text Label
+    document.getElementById('ring-size-result-label').innerText = closestMatch.size;
+}
+
+// --- Mode B: Choose Size & Display ---
+function updateComparatorSize(size) {
+    const sizeNum = parseInt(size);
+    const item = ringSizeChart.find(o => o.size === sizeNum);
+    if (!item) return;
+    
+    // Calculate required width in pixels using calibrated scale
+    const pxWidth = item.diameter * pxPerMm;
+    
+    // Resize comparison circle
+    const circle = document.getElementById('ring-compare-circle');
+    circle.style.width = pxWidth + 'px';
+    circle.style.height = pxWidth + 'px';
+    
+    // Update labels
+    document.getElementById('ring-compare-label').innerText = item.size;
+    document.getElementById('ring-compare-diameter-label').innerText = item.diameter.toFixed(2) + ' mm';
+}
+</script>
+
+<style>
+.measure-tab-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+}
+.btn-tune {
+    transition: all 0.2s ease;
+    user-select: none;
+}
+.btn-tune:active {
+    transform: scale(0.9);
+    background-color: #f0f0f0 !important;
+}
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #140C40;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    border: 2px solid #fff;
+    transition: transform 0.1s ease;
+}
+input[type="range"]::-webkit-slider-thumb:hover {
+    transform: scale(1.15);
+}
+
+/* Fix nice-select layout inside the ring sizer card */
+.yuzuk-olcer-card .nice-select {
+    float: none !important;
+    display: inline-flex !important;
+    align-items: center;
+    width: 100% !important;
+    max-width: 300px !important;
+    margin: 0 auto 25px !important;
+    height: 48px !important;
+    line-height: 46px !important;
+    border: 1px solid #c5a059 !important;
+    border-radius: 8px !important;
+    font-size: 14px !important;
+    font-weight: 700 !important;
+    color: #140C40 !important;
+    box-shadow: 0 4px 10px rgba(197, 155, 69, 0.05) !important;
+    background-color: #fff !important;
+    padding-left: 18px !important;
+    padding-right: 30px !important;
+    text-align: left !important;
+}
+
+.yuzuk-olcer-card .nice-select::after {
+    right: 18px !important;
+}
+
+.yuzuk-olcer-card .nice-select .list {
+    width: 100% !important;
+    max-height: 200px !important;
+    overflow-y: auto !important;
+}
+
+/* Ensure comparison circle wraps correctly below the dropdown */
+.yuzuk-olcer-card #ring-compare-circle {
+    clear: both !important;
+    margin: 0 auto 25px !important;
+}
+</style>
+
+<%- include('partials/footer') %>

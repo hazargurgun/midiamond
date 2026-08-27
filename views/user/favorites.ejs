@@ -1,0 +1,68 @@
+<%- include('../partials/head') %>
+<%- include('../partials/header') %>
+
+<main>
+    <div class="slider-area ">
+        <div class="single-slider slider-height2 d-flex align-items-center" style="background-image: url('/assets/img/hero/category_hero.jpg'); background-size: cover; background-position: center; min-height: 250px;">
+            <div class="container">
+                <div class="row">
+                    <div class="col-xl-12">
+                        <div class="hero-cap text-center">
+                            <h2 style="font-family: 'Outfit', sans-serif; font-weight: 300; letter-spacing: 3px; text-transform: uppercase;">Favorilerim</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section class="checkout_area section_padding" style="background-color: #faf9f6; padding: 80px 0;">
+        <div class="container">
+            <% if (typeof favorites !== 'undefined' && favorites.length > 0) { %>
+                <div class="premium-grid">
+                    <% favorites.forEach(product => { %>
+                        <div class="premium-card wow fadeInUp" data-wow-duration="1s" data-wow-delay=".1s">
+                            <div class="premium-card-img-wrapper">
+                                <a href="/product/<%= product._id %>">
+                                    <img src="<%= mediaUrl(product.imageUrl, 'thumb') %>" alt="<%= product.name %>" class="primary-img" loading="lazy">
+                                    <% if (product.images && product.images[0] && product.images[0].url) { %>
+                                    <img src="<%= mediaUrl(product.images[0].url, 'thumb') %>" alt="<%= product.name %>" class="secondary-img" loading="lazy">
+                                    <% } %>
+                                </a>
+                                <button class="fav-btn" data-id="<%= product._id %>">
+                                    <i class="fas fa-heart text-danger"></i>
+                                </button>
+                            </div>
+                            <div class="premium-card-info">
+                                <div class="premium-card-title">
+                                    <a href="/product/<%= product._id %>"><%= product.name %></a>
+                                </div>
+                                <div class="premium-card-desc">
+                                    <%= product.description ? product.description.substring(0,30) + '...' : 'Pırlanta Şıklığı' %>
+                                </div>
+                                <div class="premium-card-price-wrap">
+                                    <span class="premium-card-price">₺ <%= product.price.toLocaleString('tr-TR') %></span>
+                                </div>
+                                <div class="card-actions">
+                                    <a href="/product/<%= product._id %>" class="btn-premium-secondary" style="padding: 10px; font-size: 10px;">İncele</a>
+                                    <button onclick="window.location.href='/product/<%= product._id %>'" class="btn-premium-primary" style="padding: 10px; font-size: 10px;">Sepete Ekle</button>
+                                </div>
+                            </div>
+                        </div>
+                    <% }); %>
+                </div>
+            <% } else { %>
+                <div class="text-center" style="padding: 100px 0;">
+                    <div style="margin-bottom: 25px;">
+                        <i class="far fa-heart" style="font-size: 64px; color: #c49b45; opacity: 0.5;"></i>
+                    </div>
+                    <h3 style="font-family: 'Outfit', sans-serif; font-weight: 300; color: #111; margin-bottom: 20px;">Henüz favori ürününüz bulunmamaktadır.</h3>
+                    <p style="color: #666; font-size: 14px; margin-bottom: 30px;">Premium koleksiyonlarımızı incelemek için mağazamızı ziyaret edebilirsiniz.</p>
+                    <a href="/shop" class="border-btn" style="background: #111; color: #fff !important; border: 1px solid #111; padding: 15px 35px; font-weight: bold; text-transform: uppercase; font-size: 12px; letter-spacing: 2px; transition: all 0.3s ease; border-radius: 4px; display: inline-block;">Alışverişe Başla</a>
+                </div>
+            <% } %>
+        </div>
+    </section>
+</main>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Banner/Slider Yönetimi | Admin Paneli</title>
+    <link rel="stylesheet" href="/assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/assets/css/fontawesome-all.min.css">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        .sidebar {
+            min-height: 100vh;
+            background: #2c3e50;
+            color: white;
+            padding-top: 20px;
+        }
+
+        .sidebar a {
+            color: #bdc3c7;
+            display: block;
+            padding: 15px;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        .sidebar a:hover,
+        .sidebar a.active {
+            background: #34495e;
+            color: white;
+            border-left: 4px solid #d4af37;
+        }
+
+        .main-content {
+            padding: 30px;
+        }
+
+        .gold-text {
+            color: #d4af37;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-2 sidebar">
+                <h4 class="text-center gold-text mb-4">MI DIAMOND ADMIN</h4>
+                <a href="/admin"><i class="fas fa-tachometer-alt mr-2"></i> Dashboard</a>
+                <a href="/admin/home-settings"><i class="fas fa-home mr-2"></i> Ana Sayfa Yönetimi</a>
+                <a href="/admin/products"><i class="fas fa-gem mr-2"></i> Ürünler</a>
+                <a href="/admin/categories"><i class="fas fa-list mr-2"></i> Kategoriler</a>
+                <a href="/admin/orders"><i class="fas fa-shopping-cart mr-2"></i> Siparişler</a>
+                <a href="/admin/users"><i class="fas fa-users mr-2"></i> Kullanıcılar</a>
+                <a href="/admin/support"><i class="fas fa-comments mr-2"></i> Canlı Destek</a>
+                <a href="/admin/banners" class="active"><i class="fas fa-image mr-2"></i> Bannerlar</a>
+                <a href="/"><i class="fas fa-external-link-alt mr-2"></i> Siteye Git</a>
+                <a href="/auth/logout" class="mt-5 text-danger"><i class="fas fa-sign-out-alt mr-2"></i> Çıkış Yap</a>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-10 main-content">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2>Banner/Slider Yönetimi</h2>
+                    <button class="btn btn-warning" data-toggle="modal" data-target="#addBannerModal">Yeni Görsel
+                        Ekle</button>
+                </div>
+
+                <div class="card border-none shadow-sm">
+                    <div class="card-body">
+                        <table class="table table-hover align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Masaüstü Görsel</th>
+                                    <th>Mobil Görsel</th>
+                                    <th>Tip</th>
+                                    <th>Başlık</th>
+                                    <th>Durum</th>
+                                    <th>Boyutlar (PC / Mobil)</th>
+                                    <th>Sıra</th>
+                                    <th>İşlemler</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% banners.forEach(banner=> { %>
+                                    <tr>
+                                        <td><img src="<%= mediaUrl(banner.imageUrl, 'thumb') %>" width="100"
+                                                style="max-height: 60px; object-fit: cover; border-radius: 4px;" alt="">
+                                        </td>
+                                        <td>
+                                            <% if (banner.mobileImageUrl) { %>
+                                                <img src="<%= mediaUrl(banner.mobileImageUrl, 'thumb') %>" width="60"
+                                                    style="max-height: 60px; object-fit: cover; border-radius: 4px;"
+                                                    alt="">
+                                                <% } else { %>
+                                                    <span class="text-muted" style="font-size: 12px;">Masaüstü ile
+                                                        Aynı</span>
+                                                    <% } %>
+                                        </td>
+                                        <td>
+                                            <%= banner.type==='hero' ? 'Ana Slider (Hero)' : 'Alt Banner' %>
+                                        </td>
+                                        <td>
+                                            <%= banner.title || '-' %>
+                                        </td>
+                                        <td>
+                                            <% if (banner.isActive) { %>
+                                                <span class="badge badge-success">Aktif</span>
+                                                <% } else { %>
+                                                    <span class="badge badge-secondary">Pasif</span>
+                                                    <% } %>
+                                        </td>
+                                        <td>
+                                            <span class="badge badge-info">
+                                                <%= banner.desktopHeight || '980px' %>
+                                            </span> /
+                                            <span class="badge badge-secondary">
+                                                <%= banner.mobileHeight || '124vw' %>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <%= banner.order %>
+                                        </td>
+                                        <td>
+                                            <a href="/admin/banners/toggle/<%= banner._id %>"
+                                                class="btn btn-sm <%= banner.isActive ? 'btn-warning' : 'btn-success' %>">
+                                                <i class="fas fa-<%= banner.isActive ? 'pause' : 'play' %>"></i>
+                                            </a>
+                                            <button class="btn btn-sm btn-info edit-banner-btn"
+                                                data-id="<%= banner._id %>" data-type="<%= banner.type %>"
+                                                data-title="<%= banner.title %>" data-subtitle="<%= banner.subtitle %>"
+                                                data-link="<%= banner.link %>" data-order="<%= banner.order %>"
+                                                data-desktop-height="<%= banner.desktopHeight || '980px' %>"
+                                                data-mobile-height="<%= banner.mobileHeight || '124vw' %>"
+                                                data-image="<%= mediaUrl(banner.imageUrl, 'thumb') %>"
+                                                data-mobile-image="<%= banner.mobileImageUrl ? mediaUrl(banner.mobileImageUrl, 'thumb') : '' %>"
+                                                data-is-active="<%= banner.isActive %>" data-toggle="modal"
+                                                data-target="#editBannerModal">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <a href="/admin/banners/delete/<%= banner._id %>"
+                                                class="btn btn-sm btn-danger"
+                                                onclick="return confirm('Silmek istediğinize emin misiniz?')"><i
+                                                    class="fas fa-trash"></i></a>
+                                        </td>
+                                    </tr>
+                                    <% }); %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Banner Modal -->
+    <div class="modal fade" id="addBannerModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Yeni Görsel Ekle</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form action="/admin/banners/add" method="POST" enctype="multipart/form-data">
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label>Görsel Tipi</label>
+                            <select name="type" class="form-control">
+                                <option value="hero">Ana Slider (Hero)</option>
+                                <option value="middle">Orta Bölüm Banner</option>
+                            </select>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Masaüstü Görseli (PC)</label>
+                                    <input type="file" name="imageFile" class="form-control" accept="image/*" required>
+                                    <small class="text-muted">Önerilen: En az 1920x800px</small>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Mobil Görsel (Opsiyonel)</label>
+                                    <input type="file" name="mobileImageFile" class="form-control" accept="image/*">
+                                    <small class="text-muted">Boş bırakılırsa PC görseli kullanılır.</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Masaüstü Slider Yüksekliği</label>
+                                    <input type="text" name="desktopHeight" class="form-control" value="980px"
+                                        placeholder="Örn: 980px, 600px, veya auto">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Mobil Slider Yüksekliği</label>
+                                    <input type="text" name="mobileHeight" class="form-control" value="124vw"
+                                        placeholder="Örn: 124vw, 400px, veya auto">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Başlık (Opsiyonel)</label>
+                            <input type="text" name="title" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label>Alt Başlık (Opsiyonel)</label>
+                            <input type="text" name="subtitle" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label>Link (Opsiyonel)</label>
+                            <input type="text" name="link" class="form-control" value="/shop">
+                        </div>
+                        <div class="form-group">
+                            <label>Sıralama</label>
+                            <input type="number" name="order" class="form-control" value="0">
+                        </div>
+                        <div class="form-group">
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" name="isActive" class="custom-control-input" id="addIsActive"
+                                    checked>
+                                <label class="custom-control-label" for="addIsActive">Banner'ı aktif et</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                        <button type="submit" class="btn btn-warning">Görseli Kaydet</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Banner Modal -->
+    <div class="modal fade" id="editBannerModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Görseli Düzenle</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form id="editBannerForm" action="" method="POST" enctype="multipart/form-data">
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label>Görsel Tipi</label>
+                            <select name="type" class="form-control">
+                                <option value="hero">Ana Slider (Hero)</option>
+                                <option value="middle">Orta Bölüm Banner</option>
+                            </select>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Masaüstü Görseli (PC)</label>
+                                    <input type="file" name="imageFile" class="form-control" accept="image/*">
+                                    <small class="text-muted">Değiştirmek istemiyorsanız boş bırakın.</small>
+                                    <img id="editDesktopPreview" src="" class="img-thumbnail mt-2"
+                                        style="max-height: 80px; display: none;">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Mobil Görsel (Opsiyonel)</label>
+                                    <input type="file" name="mobileImageFile" class="form-control" accept="image/*">
+                                    <small class="text-muted">Değiştirmek istemiyorsanız boş bırakın.</small>
+                                    <img id="editMobilePreview" src="" class="img-thumbnail mt-2"
+                                        style="max-height: 80px; display: none;">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Masaüstü Slider Yüksekliği</label>
+                                    <input type="text" name="desktopHeight" class="form-control"
+                                        placeholder="Örn: 980px, 600px, veya auto">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Mobil Slider Yüksekliği</label>
+                                    <input type="text" name="mobileHeight" class="form-control"
+                                        placeholder="Örn: 124vw, 400px, veya auto">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Başlık (Opsiyonel)</label>
+                            <input type="text" name="title" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label>Alt Başlık (Opsiyonel)</label>
+                            <input type="text" name="subtitle" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label>Link (Opsiyonel)</label>
+                            <input type="text" name="link" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label>Sıralama</label>
+                            <input type="number" name="order" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" name="isActive" class="custom-control-input" id="editIsActive">
+                                <label class="custom-control-label" for="editIsActive">Banner'ı aktif et</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                        <button type="submit" class="btn btn-warning">Değişiklikleri Kaydet</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="/assets/js/vendor/jquery-1.12.4.min.js"></script>
+    <script src="/assets/js/bootstrap.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $('.edit-banner-btn').click(function () {
+                const id = $(this).data('id');
+                const type = $(this).data('type');
+                const title = $(this).data('title');
+                const subtitle = $(this).data('subtitle');
+                const link = $(this).data('link');
+                const order = $(this).data('order');
+                const desktopHeight = $(this).data('desktop-height');
+                const mobileHeight = $(this).data('mobile-height');
+                const image = $(this).data('image');
+                const mobileImage = $(this).data('mobile-image');
+                const isActive = $(this).data('is-active');
+
+                const form = $('#editBannerForm');
+                form.attr('action', '/admin/banners/edit/' + id);
+                form.find('select[name="type"]').val(type);
+                form.find('input[name="title"]').val(title);
+                form.find('input[name="subtitle"]').val(subtitle);
+                form.find('input[name="link"]').val(link);
+                form.find('input[name="order"]').val(order);
+                form.find('input[name="desktopHeight"]').val(desktopHeight);
+                form.find('input[name="mobileHeight"]').val(mobileHeight);
+                form.find('input[name="isActive"]').prop('checked', isActive === true || isActive === 'true');
+
+                $('#editDesktopPreview').attr('src', image).show();
+                if (mobileImage && mobileImage !== '') {
+                    $('#editMobilePreview').attr('src', mobileImage).show();
+                } else {
+                    $('#editMobilePreview').hide();
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

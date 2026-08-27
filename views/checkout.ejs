@@ -1,0 +1,145 @@
+<%- include('partials/head') %>
+<%- include('partials/header') %>
+
+<main>
+    <div class="slider-area ">
+        <div class="single-slider slider-height2 d-flex align-items-center">
+            <div class="container">
+                <div class="row">
+                    <div class="col-xl-12">
+                        <div class="hero-cap text-center">
+                            <h2>Güvenli Ödeme</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section class="checkout_area section_padding">
+        <div class="container">
+            <div class="row">
+                <!-- Address Form & Order Summary -->
+                <div class="col-lg-6">
+                    <div class="order_box" id="address-section">
+                        <h2>Teslimat Bilgileri</h2>
+                        <% if (!user) { %>
+                            <p class="mb-3" style="font-size: 0.95rem; color: #666;">
+                                Zaten üye misiniz? <a href="/auth/login?redirect=/checkout" style="color: #bca374; font-weight: 600; text-decoration: underline; transition: color 0.2s;">Buradan Giriş Yapın</a>
+                            </p>
+                        <% } %>
+                        <form id="payment-form">
+                            <div class="form-group">
+                                <label>Ad Soyad</label>
+                                <input type="text" class="form-control" id="user_name" value="<%= user ? (user.name + (user.surname ? ' ' + user.surname : '')) : '' %>" placeholder="Adınız Soyadınız" required>
+                            </div>
+                            <% if (!user) { %>
+                                <div class="form-group">
+                                    <label>E-posta Adresi</label>
+                                    <input type="email" class="form-control" id="user_email" placeholder="example@email.com" required>
+                                </div>
+                            <% } %>
+                            <div class="form-group">
+                                <label>Telefon</label>
+                                <input type="text" class="form-control" id="user_phone" placeholder="05XXXXXXXXX" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Açık Adres</label>
+                                <textarea class="form-control" id="user_address" rows="3" required></textarea>
+                            </div>
+                            
+                            <hr>
+                            <h2>Sipariş Özeti</h2>
+                            <ul class="list list_2 mb-4" style="list-style: none; padding-left: 0;">
+                                <% cart.forEach(item => { %>
+                                    <li class="d-flex justify-content-between mb-2" style="font-size: 0.95rem; color: #555;">
+                                        <span><%= item.name %> 
+                                            <% if (item.selectedCarat) { %>
+                                                <small class="badge badge-secondary ml-1" style="background: #e8e0d0; color: #8a7355;"><%= item.selectedCarat %> ct</small>
+                                            <% } %>
+                                            x <%= item.quantity %>
+                                        </span>
+                                        <span style="font-weight: 600;">₺ <%= (item.price * item.quantity).toLocaleString('tr-TR') %></span>
+                                    </li>
+                                <% }); %>
+                                <li class="border-top pt-3 mt-2">
+                                    <a href="#" class="d-flex justify-content-between font-weight-bold" style="color: #1a1a1a; font-size: 1.1rem;">Genel Toplam
+                                        <span>₺ <%= cartTotal.toLocaleString('tr-TR') %></span>
+                                    </a>
+                                </li>
+                            </ul>
+                            
+                            <button type="submit" class="btn_3 w-100 mt-4" id="btn-pay">Ödemeye Geç (PayTR)</button>
+                        </form>
+                    </div>
+                </div>
+                
+                <!-- PayTR Iframe Container -->
+                <div class="col-lg-6">
+                    <div class="order_box" id="paytr-section" style="display: none;">
+                        <h2>Kart Bilgileri</h2>
+                        <div style="width: 100%; margin: 0 auto; text-align: center;">
+                            <script src="https://www.paytr.com/js/iframeResizer.min.js"></script>
+                            <iframe id="paytriframe" frameborder="0" scrolling="no" style="width: 100%;"></iframe>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<script>
+document.getElementById('payment-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const btn = document.getElementById('btn-pay');
+    btn.disabled = true;
+    btn.innerText = 'İşleniyor...';
+    
+    const user_name = document.getElementById('user_name').value;
+    const user_address = document.getElementById('user_address').value;
+    const user_phone = document.getElementById('user_phone').value;
+    const user_email = document.getElementById('user_email') ? document.getElementById('user_email').value : null;
+    
+    try {
+        const response = await fetch('/payment/create-token', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                user_name,
+                user_address,
+                user_phone,
+                user_email
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.status === 'success' && data.token) {
+            // Hide left section, show iframe
+            document.getElementById('address-section').classList.add('d-none');
+            const iframeSection = document.getElementById('paytr-section');
+            iframeSection.style.display = 'block';
+            
+            const iframe = document.getElementById('paytriframe');
+            iframe.src = "https://www.paytr.com/odeme/guvenli/" + data.token;
+            
+            iFrameResize({}, '#paytriframe');
+        } else {
+            alert('Ödeme başlatılamadı: ' + (data.reason || 'Bilinmeyen Hata'));
+            btn.disabled = false;
+            btn.innerText = 'Ödemeye Geç (PayTR)';
+        }
+    } catch (error) {
+        console.error('Hata:', error);
+        alert('Sunucu ile iletişim kurulamadı.');
+        btn.disabled = false;
+        btn.innerText = 'Ödemeye Geç (PayTR)';
+    }
+});
+</script>
+
+<%- include('partials/footer') %>

@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ana Sayfa Yönetimi | Admin Paneli</title>
+    <link rel="stylesheet" href="/assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/assets/css/fontawesome-all.min.css">
+    <style>
+        body { font-family: 'Poppins', sans-serif; background-color: #f8f9fa; }
+        .sidebar { min-height: 100vh; background: #2c3e50; color: white; padding-top: 20px; }
+        .sidebar a { color: #bdc3c7; display: block; padding: 15px; text-decoration: none; transition: 0.3s; }
+        .sidebar a:hover, .sidebar a.active { background: #34495e; color: white; border-left: 4px solid #d4af37; }
+        .main-content { padding: 30px; }
+        .gold-text { color: #d4af37; }
+        .nav-tabs .nav-link { color: #495057; font-weight: 500; border: none; border-bottom: 2px solid transparent; }
+        .nav-tabs .nav-link.active { color: #d4af37; border: none; border-bottom: 2px solid #d4af37; background: transparent; }
+        .card { border: none; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .btn-warning { background-color: #d4af37; border-color: #d4af37; color: white; }
+        .btn-warning:hover { background-color: #c49b45; border-color: #c49b45; color: white; }
+        .badge-premium { background-color: #fcf8e3; color: #c49b45; border: 1px solid #faebcc; font-weight: 600; }
+    </style>
+</head>
+<body>
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-2 sidebar">
+            <h4 class="text-center gold-text mb-4">MI DIAMOND ADMIN</h4>
+            <a href="/admin"><i class="fas fa-tachometer-alt mr-2"></i> Dashboard</a>
+            <a href="/admin/home-settings" class="active"><i class="fas fa-home mr-2"></i> Ana Sayfa Yönetimi</a>
+            <a href="/admin/products"><i class="fas fa-gem mr-2"></i> Ürünler</a>
+            <a href="/admin/categories"><i class="fas fa-list mr-2"></i> Kategoriler</a>
+            <a href="/admin/orders"><i class="fas fa-shopping-cart mr-2"></i> Siparişler</a>
+            <a href="/admin/users"><i class="fas fa-users mr-2"></i> Kullanıcılar</a>
+            <a href="/admin/support"><i class="fas fa-comments mr-2"></i> Canlı Destek</a>
+            <a href="/admin/banners"><i class="fas fa-image mr-2"></i> Bannerlar</a>
+            <a href="/"><i class="fas fa-external-link-alt mr-2"></i> Siteye Git</a>
+            <a href="/auth/logout" class="mt-5 text-danger"><i class="fas fa-sign-out-alt mr-2"></i> Çıkış Yap</a>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-md-10 main-content">
+            <h2 class="mb-4">Ana Sayfa Yönetimi</h2>
+
+            <% if (typeof query !== 'undefined' && query.msg === 'success') { %>
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    İşlem başarıyla gerçekleştirildi!
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            <% } %>
+
+            <!-- Tabs -->
+            <ul class="nav nav-tabs mb-4" id="homeTabs" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" id="headings-tab" data-toggle="tab" href="#headings" role="tab"><i class="fas fa-heading mr-2"></i> Genel Başlıklar & Hizmetler</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="promo-tab" data-toggle="tab" href="#promo" role="tab"><i class="fas fa-tags mr-2"></i> Promo Menü (Üst Bar)</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="sections-tab" data-toggle="tab" href="#sections" role="tab"><i class="fas fa-layer-group mr-2"></i> Özel Reyonlar (Dinamik Bölümler)</a>
+                </li>
+            </ul>
+
+            <div class="tab-content" id="homeTabsContent">
+                <!-- Headings & Services Tab -->
+                <div class="tab-pane fade show active" id="headings" role="tabpanel">
+                    <div class="card p-4">
+                        <form action="/admin/home-settings/update" method="POST">
+                            <h4 class="mb-3 gold-text pb-2 border-bottom">Ürün Reyonu Genel Başlığı</h4>
+                            <div class="form-group mb-4">
+                                <label class="font-weight-bold">Yeni Gelenler Reyon Başlığı</label>
+                                <input type="text" name="newArrivalTitle" class="form-control" value="<%= setting.newArrivalTitle %>" required>
+                                <small class="text-muted">Ana sayfadaki varsayılan ürün listesinin üstündeki başlık yazısı.</small>
+                            </div>
+
+                            <h4 class="mb-3 gold-text pb-2 border-bottom mt-5">Hizmet Kutuları (Hizmet Bilgileri)</h4>
+                            <div class="row">
+                                <!-- Service 1 -->
+                                <div class="col-md-6 mb-3">
+                                    <div class="p-3 border rounded bg-light">
+                                        <h5 class="font-weight-bold text-dark mb-3"><i class="fas fa-truck mr-2"></i> Hizmet Kartı 1</h5>
+                                        <div class="form-group">
+                                            <label>Başlık</label>
+                                            <input type="text" name="service1Title" class="form-control" value="<%= setting.service1Title %>" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Açıklama</label>
+                                            <input type="text" name="service1Desc" class="form-control" value="<%= setting.service1Desc %>" required>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Service 2 -->
+                                <div class="col-md-6 mb-3">
+                                    <div class="p-3 border rounded bg-light">
+                                        <h5 class="font-weight-bold text-dark mb-3"><i class="fas fa-lock mr-2"></i> Hizmet Kartı 2</h5>
+                                        <div class="form-group">
+                                            <label>Başlık</label>
+                                            <input type="text" name="service2Title" class="form-control" value="<%= setting.service2Title %>" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Açıklama</label>
+                                            <input type="text" name="service2Desc" class="form-control" value="<%= setting.service2Desc %>" required>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Service 3 -->
+                                <div class="col-md-6 mb-3">
+                                    <div class="p-3 border rounded bg-light">
+                                        <h5 class="font-weight-bold text-dark mb-3"><i class="fas fa-store mr-2"></i> Hizmet Kartı 3</h5>
+                                        <div class="form-group">
+                                            <label>Başlık</label>
+                                            <input type="text" name="service3Title" class="form-control" value="<%= setting.service3Title %>" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Açıklama</label>
+                                            <input type="text" name="service3Desc" class="form-control" value="<%= setting.service3Desc %>" required>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Service 4 -->
+                                <div class="col-md-6 mb-3">
+                                    <div class="p-3 border rounded bg-light">
+                                        <h5 class="font-weight-bold text-dark mb-3"><i class="fas fa-user-tie mr-2"></i> Hizmet Kartı 4</h5>
+                                        <div class="form-group">
+                                            <label>Başlık</label>
+                                            <input type="text" name="service4Title" class="form-control" value="<%= setting.service4Title %>" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Açıklama</label>
+                                            <input type="text" name="service4Desc" class="form-control" value="<%= setting.service4Desc %>" required>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Promo Navigation Tab -->
+                    <div class="tab-pane fade" id="promo" role="tabpanel">
+                        <div class="card p-4">
+                            <h4 class="mb-3 gold-text pb-2 border-bottom"><i class="fas fa-tags mr-2"></i> Üst Menü Promo Linkleri</h4>
+                            <p class="text-muted mb-4">Sitenin üst kısmında (header altında) görüntülenen promosyon menü öğelerini yönetin. Başlığı boş bırakırsanız o öğe gizlenir.</p>
+                            <div class="row">
+                                <% for (let i = 1; i <= 5; i++) { %>
+                                <div class="col-md-6 mb-3">
+                                    <div class="p-3 border rounded bg-light">
+                                        <h5 class="font-weight-bold text-dark mb-3"><i class="fas fa-link mr-2"></i> Menü Öğesi <%= i %></h5>
+                                        <div class="form-group">
+                                            <label>Başlık</label>
+                                            <input type="text" name="promoNav<%= i %>Label" class="form-control" value="<%= setting['promoNav' + i + 'Label'] || '' %>" placeholder="Örn: Yeni Sezon">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Bağlantı (Kategori)</label>
+                                            <select name="promoNav<%= i %>Category" class="form-control">
+                                                <option value="">-- Kategori Seç -- (Shop Sayfası)</option>
+                                                <% categories.forEach(cat => { %>
+                                                <option value="<%= cat.slug %>" <%= setting['promoNav' + i + 'Category'] === cat.slug ? 'selected' : '' %>><%= cat.name %></option>
+                                                <% }) %>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <% } %>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-right mt-4">
+                        <button type="submit" class="btn btn-warning px-5 py-2 font-weight-bold"><i class="fas fa-save mr-2"></i> Değişiklikleri Kaydet</button>
+                    </div>
+                </form>
+
+                <!-- Custom Sections Tab -->
+                <div class="tab-pane fade" id="sections" role="tabpanel">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h4 class="gold-text m-0"><i class="fas fa-list-ul mr-2"></i> Özel Reyon Listesi</h4>
+                        <button class="btn btn-warning" data-toggle="modal" data-target="#addSectionModal"><i class="fas fa-plus mr-2"></i> Yeni Reyon Ekle</button>
+                    </div>
+
+                    <div class="card p-3">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 80px;">Sıra No</th>
+                                        <th>Reyon Başlığı</th>
+                                        <th>İçerdiği Ürünler</th>
+                                        <th style="width: 150px;" class="text-right">İşlemler</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% if (sections && sections.length > 0) { %>
+                                        <% sections.forEach(sec => { %>
+                                            <tr>
+                                                <td><span class="badge badge-warning text-dark font-weight-bold" style="font-size: 0.95rem; padding: 5px 12px;"><%= sec.order %></span></td>
+                                                <td class="font-weight-bold"><%= sec.title %></td>
+                                                <td>
+                                                    <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                                                        <% sec.products.forEach(p => { %>
+                                                            <span class="badge badge-premium px-2 py-1"><%= p.name %></span>
+                                                        <% }); %>
+                                                        <% if (sec.products.length === 0) { %>
+                                                            <span class="text-muted small">Bu reyon henüz ürün içermiyor.</span>
+                                                        <% } %>
+                                                    </div>
+                                                </td>
+                                                <td class="text-right">
+                                                    <button class="btn btn-sm btn-warning mr-2" data-toggle="modal" data-target="#editSectionModal" 
+                                                            onclick="populateEditSection('<%= sec._id %>', '<%= sec.title %>', '<%= sec.order %>', <%= JSON.stringify(sec.products.map(p => p._id)) %>)">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                    <a href="/admin/home-sections/delete/<%= sec._id %>" class="btn btn-sm btn-danger" onclick="return confirm('Bu reyonu silmek istediğinize emin misiniz?')">
+                                                        <i class="fas fa-trash"></i>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        <% }); %>
+                                    <% } else { %>
+                                        <tr>
+                                            <td colspan="4" class="text-center py-4 text-muted">
+                                                Henüz özel bir ana sayfa reyonu oluşturulmamış. Yeni bir reyon ekleyerek ana sayfada dilediğiniz başlık altında özel ürün grupları listeleyebilirsiniz!
+                                            </td>
+                                        </tr>
+                                    <% } %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Section Modal -->
+<div class="modal fade" id="addSectionModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title font-weight-bold"><i class="fas fa-layer-group gold-text mr-2"></i> Yeni Özel Ürün Reyonu Ekle</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form action="/admin/home-sections/add" method="POST">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="form-group">
+                                <label class="font-weight-bold">Reyon Başlığı</label>
+                                <input type="text" name="title" class="form-control" placeholder="Örn: Sevgililer Günü Özel Seçkisi" required>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label class="font-weight-bold">Görüntüleme Sırası (Order)</label>
+                                <input type="number" name="order" class="form-control" value="0" min="0" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="font-weight-bold">Reyonda Listelenecek Ürünleri Seçin</label>
+                        <div class="border rounded p-3 bg-light" style="max-height: 250px; overflow-y: auto;">
+                            <div class="row">
+                                <% products.forEach(prod => { %>
+                                    <div class="col-md-6 mb-2">
+                                        <div class="custom-control custom-checkbox">
+                                            <input type="checkbox" name="products" class="custom-control-input" id="checkAdd_<%= prod._id %>" value="<%= prod._id %>">
+                                            <label class="custom-control-label small" for="checkAdd_<%= prod._id %>">
+                                                <%= prod.name %> - <strong>₺<%= prod.price %></strong>
+                                            </label>
+                                        </div>
+                                    </div>
+                                <% }); %>
+                            </div>
+                        </div>
+                        <small class="text-muted">Ana sayfada bu başlık altında gösterilmesini istediğiniz tüm ürünleri seçin.</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                    <button type="submit" class="btn btn-warning">Reyonu Kaydet</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Section Modal -->
+<div class="modal fade" id="editSectionModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title font-weight-bold"><i class="fas fa-edit gold-text mr-2"></i> Özel Reyonu Düzenle</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="editSectionForm" action="" method="POST">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="form-group">
+                                <label class="font-weight-bold">Reyon Başlığı</label>
+                                <input type="text" id="editSectionTitle" name="title" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label class="font-weight-bold">Görüntüleme Sırası (Order)</label>
+                                <input type="number" id="editSectionOrder" name="order" class="form-control" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="font-weight-bold">Reyonda Listelenecek Ürünleri Seçin</label>
+                        <div class="border rounded p-3 bg-light" style="max-height: 250px; overflow-y: auto;">
+                            <div class="row">
+                                <% products.forEach(prod => { %>
+                                    <div class="col-md-6 mb-2">
+                                        <div class="custom-control custom-checkbox">
+                                            <input type="checkbox" name="products" class="custom-control-input edit-product-checkbox" id="checkEdit_<%= prod._id %>" value="<%= prod._id %>">
+                                            <label class="custom-control-label small" for="checkEdit_<%= prod._id %>">
+                                                <%= prod.name %> - <strong>₺<%= prod.price %></strong>
+                                            </label>
+                                        </div>
+                                    </div>
+                                <% }); %>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                    <button type="submit" class="btn btn-warning">Değişiklikleri Kaydet</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="/assets/js/vendor/jquery-1.12.4.min.js"></script>
+<script src="/assets/js/bootstrap.min.js"></script>
+<script>
+    function populateEditSection(id, title, order, productIds) {
+        document.getElementById('editSectionTitle').value = title;
+        document.getElementById('editSectionOrder').value = order;
+        document.getElementById('editSectionForm').action = '/admin/home-sections/edit/' + id;
+        
+        // Reset check boxes
+        document.querySelectorAll('.edit-product-checkbox').forEach(cb => {
+            cb.checked = false;
+        });
+
+        // Set matching boxes as checked
+        productIds.forEach(pId => {
+            const cb = document.getElementById('checkEdit_' + pId);
+            if (cb) cb.checked = true;
+        });
+    }
+
+    // Keep active tab state on reload if query params are present
+    $(document).ready(function(){
+        const hash = window.location.hash;
+        if(hash) {
+            $('.nav-tabs a[href="' + hash + '"]').tab('show');
+        }
+        
+        // On click change hash
+        $('.nav-tabs a').on('shown.bs.tab', function (e) {
+            window.location.hash = e.target.hash;
+        });
+    });
+</script>
+</body>
+</html>

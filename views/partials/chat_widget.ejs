@@ -1,0 +1,268 @@
+<!-- Chat Widget -->
+<div id="chat-widget-container">
+    <!-- Chat Button -->
+    <button id="chat-widget-button" onclick="toggleChat()">
+        <i class="fas fa-comments"></i>
+        <span class="chat-badge" id="chat-notification" style="display: none;">!</span>
+    </button>
+
+    <!-- Chat Window -->
+    <div id="chat-window" style="display: none;">
+        <div class="chat-header">
+            <div class="chat-header-info">
+                <div class="chat-status-dot"></div>
+                <span>MI DIAMOND Destek</span>
+            </div>
+            <button onclick="toggleChat()"><i class="fas fa-times"></i></button>
+        </div>
+        
+        <div id="chat-messages">
+            <!-- Messages will load here -->
+            <div class="chat-msg system">
+                MI DIAMOND Canlı Destek hattına hoş geldiniz. Size nasıl yardımcı olabiliriz?
+            </div>
+        </div>
+
+        <div class="chat-footer">
+            <% if (locals.user) { %>
+                <div class="chat-input-wrapper">
+                    <input type="text" id="chat-input" placeholder="Mesajınızı yazın..." onkeypress="handleChatKey(event)">
+                    <button onclick="sendChatMessage()"><i class="fas fa-paper-plane"></i></button>
+                </div>
+            <% } else { %>
+                <div class="chat-login-prompt">
+                    Mesaj göndermek için <a href="/login">Giriş Yapın</a>
+                </div>
+            <% } %>
+        </div>
+    </div>
+</div>
+
+<style>
+    #chat-widget-container {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        z-index: 9999;
+        font-family: 'Inter', sans-serif;
+    }
+
+    #chat-widget-button {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: var(--premium-black);
+        color: white;
+        border: none;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        cursor: pointer;
+        font-size: 24px;
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    #chat-widget-button:hover {
+        transform: scale(1.1) rotate(5deg);
+        background: var(--premium-gold);
+    }
+
+    #chat-window {
+        position: absolute;
+        bottom: 80px;
+        right: 0;
+        width: 350px;
+        height: 450px;
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 15px 50px rgba(0,0,0,0.15);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        border: 1px solid #f0f0f0;
+    }
+
+    .chat-header {
+        padding: 20px;
+        background: var(--premium-black);
+        color: white;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .chat-status-dot {
+        width: 8px;
+        height: 8px;
+        background: #4cd137;
+        border-radius: 50%;
+        margin-right: 8px;
+        display: inline-block;
+    }
+
+    #chat-messages {
+        flex: 1;
+        padding: 20px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        background: #fcfcfc;
+    }
+
+    .chat-msg {
+        max-width: 80%;
+        padding: 10px 15px;
+        border-radius: 15px;
+        font-size: 14px;
+        line-height: 1.4;
+    }
+
+    .chat-msg.user {
+        align-self: flex-end;
+        background: var(--premium-black);
+        color: white;
+        border-bottom-right-radius: 2px;
+    }
+
+    .chat-msg.admin {
+        align-self: flex-start;
+        background: #f0f0f0;
+        color: #333;
+        border-bottom-left-radius: 2px;
+    }
+
+    .chat-msg.system {
+        align-self: center;
+        background: transparent;
+        color: #999;
+        font-style: italic;
+        font-size: 12px;
+        text-align: center;
+    }
+
+    .chat-footer {
+        padding: 15px;
+        border-top: 1px solid #eee;
+        background: white;
+    }
+
+    .chat-input-wrapper {
+        display: flex;
+        gap: 10px;
+    }
+
+    #chat-input {
+        flex: 1;
+        border: 1px solid #eee;
+        padding: 10px 15px;
+        border-radius: 50px;
+        outline: none;
+        font-size: 14px;
+    }
+
+    .chat-input-wrapper button {
+        background: var(--premium-black);
+        color: white;
+        border: none;
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    .chat-input-wrapper button:hover {
+        background: var(--premium-gold);
+    }
+
+    .chat-login-prompt {
+        text-align: center;
+        font-size: 13px;
+        color: #666;
+    }
+
+    .chat-login-prompt a {
+        color: var(--premium-gold);
+        font-weight: bold;
+    }
+
+    @media (max-width: 767px) {
+        #chat-widget-container {
+            bottom: 95px;
+            right: 20px;
+        }
+        #chat-widget-button {
+            width: 50px;
+            height: 50px;
+            font-size: 20px;
+        }
+        #chat-window {
+            width: calc(100vw - 40px);
+            right: 0;
+            bottom: 65px;
+            height: 400px;
+        }
+    }
+</style>
+
+<script>
+    let chatOpen = false;
+    let lastMessageCount = 0;
+
+    function toggleChat() {
+        const win = document.getElementById('chat-window');
+        chatOpen = !chatOpen;
+        win.style.display = chatOpen ? 'flex' : 'none';
+        if (chatOpen) {
+            loadChatMessages();
+            document.getElementById('chat-notification').style.display = 'none';
+        }
+    }
+
+    async function loadChatMessages() {
+        try {
+            const res = await fetch('/chat/messages');
+            const data = await res.json();
+            if (data.success) {
+                const container = document.getElementById('chat-messages');
+                container.innerHTML = '<div class="chat-msg system">Size nasıl yardımcı olabiliriz?</div>';
+                
+                data.messages.forEach(msg => {
+                    const div = document.createElement('div');
+                    div.className = `chat-msg ${msg.isAdminSender ? 'admin' : 'user'}`;
+                    div.innerText = msg.content;
+                    container.appendChild(div);
+                });
+                
+                container.scrollTop = container.scrollHeight;
+            }
+        } catch (e) { console.error(e); }
+    }
+
+    async function sendChatMessage() {
+        const input = document.getElementById('chat-input');
+        const content = input.value.trim();
+        if (!content) return;
+
+        input.value = '';
+        try {
+            const res = await fetch('/chat/send', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ content })
+            });
+            const data = await res.json();
+            if (data.success) {
+                loadChatMessages();
+            }
+        } catch (e) { console.error(e); }
+    }
+
+    function handleChatKey(e) {
+        if (e.key === 'Enter') sendChatMessage();
+    }
+
+    // Auto-refresh messages every 5 seconds if chat is open
+    setInterval(() => {
+        if (chatOpen) loadChatMessages();
+    }, 5000);
+</script>

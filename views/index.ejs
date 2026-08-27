@@ -1,0 +1,1143 @@
+<%- include('partials/head') %>
+    <%- include('partials/header') %>
+
+        <main>
+            <style>
+                /* Hero ile altındaki bölüm arasındaki boşluğu azaltma */
+                .new-arrival.hero-adjacent-section {
+                    padding-top: 15px !important;
+                }
+
+                .slider-area {
+                    margin-top: 0;
+                }
+
+                @media (max-width: 991px) {
+                    .slider-area {
+                        margin-top: 24px;
+                    }
+                }
+
+                @media (max-width: 767px) {
+                    .slider-area .hero__caption {
+                        padding: 0 12px !important;
+                    }
+
+                    .slider-area .hero__caption h1 {
+                        font-size: 28px;
+                        /* Mobilde daha okunaklı ve dengeli bir yazı boyutu */
+                        line-height: 1.2;
+                        margin-bottom: 18px;
+                    }
+                }
+
+                @media (max-width: 575px) {
+                    .slider-area .hero__caption h1 {
+                        font-size: 24px;
+                    }
+                }
+
+                /* Dinamik Slider Stilleri */
+                <% if (typeof heroBanners !=='undefined' && heroBanners.length > 0) {
+                    %><% heroBanners.forEach(banner=> {
+                            %>
+
+                            /* <%= banner.title || 'Slider' %> Masaüstü Stili */
+                            .banner-item-<%=banner._id %> {
+                                min-height: <%=banner.desktopHeight || '980px' %> !important;
+                                background-image: url('<%= mediaUrl(banner.imageUrl, 'large') %>') !important;
+                                background-size: cover !important;
+                                background-position: center center !important;
+                            }
+
+                            @media (max-width: 1199px) {
+                                .banner-item-<%=banner._id %> {
+                                    <% if ((banner.desktopHeight || '980px').endsWith ('px')) {
+                                        %> min-height: <%=Math.round(parseInt(banner.desktopHeight || '980') * 0.86) %>px !important;
+                                        <%
+                                    }
+
+                                    else {
+                                        %> min-height: <%=banner.desktopHeight || '980px' %> !important;
+                                        <%
+                                    }
+
+                                    %>
+                                }
+                            }
+
+                            @media (max-width: 991px) {
+                                .banner-item-<%=banner._id %> {
+                                    <% if ((banner.desktopHeight || '980px').endsWith ('px')) {
+                                        %> min-height: <%=Math.round(parseInt(banner.desktopHeight || '980') * 0.76) %>px !important;
+                                        <%
+                                    }
+
+                                    else {
+                                        %> min-height: <%=banner.desktopHeight || '980px' %> !important;
+                                        <%
+                                    }
+
+                                    %>
+                                }
+                            }
+
+                            /* <%= banner.title || 'Slider' %> Mobil Stili */
+                            @media (max-width: 767px) {
+                                .banner-item-<%=banner._id %> {
+                                    min-height: auto !important;
+                                    height: <%=banner.mobileHeight || '124vw' %> !important;
+                                    background-image: url('<%= mediaUrl(banner.mobileImageUrl || banner.imageUrl, 'large') %>') !important;
+                                    background-size: cover !important;
+                                    background-position: center center !important;
+                                }
+                            }
+
+                            @media (max-width: 575px) {
+                                .banner-item-<%=banner._id %> {
+                                    min-height: auto !important;
+                                    height: <%=banner.mobileHeight || '124vw' %> !important;
+                                }
+                            }
+
+                            <%
+                        });
+                    %><%
+                }
+
+                %>
+            </style>
+            <!--? Hero Area Start-->
+            <div class="container-fluid">
+                <div class="slider-area">
+                    <div class="slider-active dot-style">
+                        <% if (typeof heroBanners !=='undefined' && heroBanners.length> 0) { %>
+                            <% heroBanners.forEach(banner=> { %>
+                                <div
+                                    class="single-slider hero-overly slider-height d-flex align-items-center banner-item-<%= banner._id %>">
+                                    <div class="container">
+                                        <div class="row justify-content-center">
+                                            <div class="col-xl-8 col-lg-9">
+                                                <!-- Hero Caption -->
+                                                <div class="hero__caption">
+                                                    <h1><%- banner.title ? banner.title.replace(/\n/g, '<br>' ) : '' %>
+                                                    </h1>
+                                                    <a href="<%= banner.link %>" class="btn">
+                                                        <%= banner.subtitle || 'Şimdi Al' %>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <% }); %>
+                                    <% } else { %>
+                                        <!-- Fallback if no banners -->
+                                        <div style="cursor: pointer; width: 100%; line-height: 0;"
+                                            onclick="window.location.href='/shop'">
+                                            <picture>
+                                                <source media="(max-width: 767px)"
+                                                    srcset="/assets/img/hero/whatsapp_hero_mobile.jpeg">
+                                                <img src="/assets/img/hero/slider_1.png" alt="Açılışa Özel Kampanya"
+                                                    style="width: 100%; height: auto; display: block;">
+                                            </picture>
+                                        </div>
+                                        <% } %>
+                    </div>
+                </div>
+            </div>
+            <!-- End Hero -->
+
+            <!--? Services Area Start -->
+            <div class="categories-area gray-bg" style="padding: 35px 0; border-bottom: 1px solid rgba(0,0,0,0.05);">
+                <div class="container">
+                    <style>
+                        .services-old-grid {
+                            display: grid;
+                            grid-template-columns: repeat(4, 1fr);
+                            gap: 0;
+                            text-align: center;
+                        }
+
+                        .service-old-item {
+                            display: flex;
+                            flex-direction: row;
+                            align-items: center;
+                            justify-content: center;
+                            padding: 20px 15px;
+                            border-right: 1px solid rgba(0, 0, 0, 0.07);
+                        }
+
+                        .service-old-item:last-child {
+                            border-right: none;
+                        }
+
+                        .service-old-icon {
+                            margin-right: 14px;
+                            flex-shrink: 0;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            transition: transform 0.3s ease;
+                        }
+
+                        .service-old-item:hover .service-old-icon {
+                            transform: translateY(-3px);
+                        }
+
+                        .service-old-icon svg {
+                            width: 36px;
+                            height: 36px;
+                        }
+
+                        .service-old-text {
+                            text-align: left;
+                        }
+
+                        .service-old-title {
+                            font-family: 'Montserrat', sans-serif !important;
+                            font-size: 13px;
+                            font-weight: 600;
+                            color: #1a1a1a;
+                            line-height: 1.3;
+                            margin: 0 0 3px 0;
+                        }
+
+                        .service-old-desc {
+                            font-family: 'Montserrat', sans-serif !important;
+                            font-size: 11px;
+                            font-weight: 400;
+                            color: #777;
+                            line-height: 1.4;
+                            margin: 0;
+                        }
+
+                        @media (max-width: 991px) {
+                            .services-old-grid {
+                                grid-template-columns: repeat(2, 1fr);
+                            }
+
+                            .service-old-item {
+                                border-right: 1px solid rgba(0, 0, 0, 0.07);
+                                border-bottom: 1px solid rgba(0, 0, 0, 0.07);
+                            }
+
+                            .service-old-item:nth-child(2n) {
+                                border-right: none;
+                            }
+
+                            .service-old-item:nth-last-child(-n+2) {
+                                border-bottom: none;
+                            }
+                        }
+
+                        @media (max-width: 575px) {
+                            .services-old-grid {
+                                grid-template-columns: repeat(2, 1fr);
+                            }
+
+                            .service-old-item {
+                                padding: 16px 10px;
+                                flex-direction: column;
+                                align-items: center;
+                            }
+
+                            .service-old-icon {
+                                margin-right: 0;
+                                margin-bottom: 8px;
+                            }
+
+                            .service-old-text {
+                                text-align: center;
+                            }
+
+                            .service-old-title {
+                                font-size: 11px;
+                            }
+
+                            .service-old-desc {
+                                font-size: 10px;
+                            }
+                        }
+                    </style>
+                    <div class="services-old-grid">
+                        <!-- Item 1: Sigortalı Teslimat -->
+                        <div class="service-old-item">
+                            <div class="service-old-icon">
+                                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a"
+                                    stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="1" y="3" width="15" height="13" rx="2" ry="2" />
+                                    <polygon points="16 8 20 8 23 11 23 16 16 16 16 8" />
+                                    <circle cx="5.5" cy="18.5" r="2.5" />
+                                    <circle cx="18.5" cy="18.5" r="2.5" />
+                                </svg>
+                            </div>
+                            <div class="service-old-text">
+                                <h5 class="service-old-title">Sigortalı Teslimat</h5>
+                                <p class="service-old-desc">Güvenli ve hızlı kargo</p>
+                            </div>
+                        </div>
+
+                        <!-- Item 2: Güvenli Ödeme -->
+                        <div class="service-old-item">
+                            <div class="service-old-icon">
+                                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a"
+                                    stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
+                                    <line x1="1" y1="10" x2="23" y2="10" />
+                                </svg>
+                            </div>
+                            <div class="service-old-text">
+                                <h5 class="service-old-title">Güvenli Ödeme</h5>
+                                <p class="service-old-desc">256-bit SSL şifreleme</p>
+                            </div>
+                        </div>
+
+                        <!-- Item 3: Kolay İade -->
+                        <div class="service-old-item">
+                            <div class="service-old-icon">
+                                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a"
+                                    stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+                                    <path d="M3 3v5h5" />
+                                </svg>
+                            </div>
+                            <div class="service-old-text">
+                                <h5 class="service-old-title">Kolay İade</h5>
+                                <p class="service-old-desc">14 gün iade garantisi</p>
+                            </div>
+                        </div>
+
+                        <!-- Item 4: Uzman Destek -->
+                        <div class="service-old-item">
+                            <div class="service-old-icon">
+                                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a"
+                                    stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path
+                                        d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.6 3.4 2 2 0 0 1 3.57 1.22h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.76a16 16 0 0 0 6 6l.92-.92a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7a2 2 0 0 1 1.72 2.03z" />
+                                </svg>
+                            </div>
+                            <div class="service-old-text">
+                                <h5 class="service-old-title">Uzman Destek</h5>
+                                <p class="service-old-desc">7/24 müşteri hizmetleri</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--? Services Area End -->
+
+            <!--? New Arrival Start -->
+            <div class="new-arrival">
+                <div class="container">
+                    <!-- Section title & Sorting Dropdown -->
+                    <div class="row justify-content-center mb-40">
+                        <div class="col-xl-7 col-lg-8 col-md-10 text-center">
+                            <div class="section-tittle mb-20">
+                                <h2>
+                                    <%= typeof setting !=='undefined' ? (setting.newArrivalTitle || 'Yeni Gelenler' )
+                                        : 'Yeni Gelenler' %>
+                                </h2>
+                            </div>
+                            <!-- Premium Sorting Dropdown -->
+                            <div class="sorting-wrapper">
+                                <label for="homeProductSort">Sıralama:</label>
+                                <select id="homeProductSort">
+                                    <option value="newest" selected>En Yeniler (Varsayılan)</option>
+                                    <option value="price-asc">Fiyat: Düşükten Yükseğe</option>
+                                    <option value="price-desc">Fiyat: Yüksekten Düşüğe</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="premium-grid" id="homeProductGrid">
+                        <% if (typeof products !=='undefined' && products.length> 0) { %>
+                            <% products.forEach((product, index)=> {
+                                const isHidden = index >= 16;
+                                %>
+                                <div class="premium-card <%= isHidden ? 'premium-card-hidden' : '' %>"
+                                    data-price="<%= product.price %>"
+                                    data-date="<%= product.createdAt ? product.createdAt.getTime() : 0 %>"
+                                    style="<%= isHidden ? 'display: none !important;' : '' %>">
+                                    <div class="premium-card-img-wrapper">
+                                        <a href="/product/<%= product._id %>">
+                                            <% const homeThumb = mediaUrl(product.imageUrl, 'thumb'); %>
+                                            <% const homeHover = (product.images && product.images[0] && product.images[0].url) ? mediaUrl(product.images[0].url, 'thumb') : null; %>
+                                            <img
+                                                <% if (isHidden) { %>data-src="<%= homeThumb %>"<% } else { %>src="<%= homeThumb %>"<% } %>
+                                                alt="<%= product.name %>"
+                                                class="primary-img"
+                                                loading="<%= index < 4 ? 'eager' : 'lazy' %>">
+                                            <% if (homeHover) { %>
+                                            <img
+                                                <% if (isHidden) { %>data-src="<%= homeHover %>"<% } else { %>src="<%= homeHover %>"<% } %>
+                                                alt="<%= product.name %>"
+                                                class="secondary-img" loading="lazy">
+                                            <% } %>
+                                        </a>
+                                        <button class="fav-btn" data-id="<%= product._id %>">
+                                            <i
+                                                class="<%= (typeof userFavorites !== 'undefined' && userFavorites.includes(product._id.toString())) ? 'fas fa-heart text-danger' : 'far fa-heart' %>"></i>
+                                        </button>
+                                    </div>
+                                    <div class="premium-card-info">
+                                        <div class="premium-card-title"><a href="/product/<%= product._id %>">
+                                                <%= product.name %>
+                                            </a></div>
+                                        <div class="premium-card-desc">
+                                            <%= product.description ? product.description.substring(0,30) + '...'
+                                                : 'Pırlanta Şıklığı' %>
+                                        </div>
+                                        <div class="premium-card-price-wrap">
+                                            <span class="premium-card-price">₺ <%= product.price.toLocaleString('tr-TR')
+                                                    %></span>
+                                            <% if (product.price> 1000) { %>
+                                                <span class="premium-card-old-price">₺ <%= Math.round(product.price *
+                                                        1.2).toLocaleString('tr-TR') %></span>
+                                                <% } %>
+                                        </div>
+                                        <div class="card-actions">
+                                            <a href="/product/<%= product._id %>" class="btn-premium-secondary"
+                                                style="padding: 10px; font-size: 10px;">İncele</a>
+                                            <button
+                                                onclick="openHomeAddToCartModal('<%= product._id %>', '<%= product.name %>', '<%= product.price %>', '<%= mediaUrl(product.imageUrl, 'thumb') %>')"
+                                                class="btn-premium-primary"
+                                                style="padding: 10px; font-size: 10px;">Sepete Ekle</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <% }); %>
+                                    <% } else { %>
+                                        <div style="grid-column: 1 / -1; text-align: center; padding: 50px 0;">
+                                            <p style="font-size: 16px; color: #888;">Henüz ürün eklenmemiş.</p>
+                                        </div>
+                                        <% } %>
+                    </div>
+                    <!-- Expandable Show More Button -->
+                    <div class="row justify-content-center" style="margin-top: 40px; margin-bottom: 20px;">
+                        <div class="room-btn" id="showMoreContainer"
+                            style="<%= (typeof products !== 'undefined' && products.length <= 16) ? 'display: none;' : 'display: flex;' %>">
+                            <button id="btnShowMore" class="border-btn"
+                                style="background: transparent; cursor: pointer; border: 1px solid #c49b45; padding: 15px 35px; font-weight: bold; text-transform: uppercase; font-size: 12px; letter-spacing: 2px; transition: all 0.3s ease; border-radius: 4px;">Daha
+                                Fazla Göster</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--? New Arrival End -->
+
+            <!--? Dinamik Özel Reyonlar Başlangıcı -->
+            <% if (typeof sections !=='undefined' && sections.length> 0) { %>
+                <% sections.forEach(sec=> { %>
+                    <% if (sec.products && sec.products.length> 0) { %>
+                        <div class="new-arrival dynamic-section pt-50 pb-50"
+                            style="border-top: 1px solid rgba(0,0,0,0.03);">
+                            <div class="container">
+                                <div class="row justify-content-center mb-40">
+                                    <div class="col-xl-7 col-lg-8 col-md-10 text-center">
+                                        <div class="section-tittle mb-20">
+                                            <h2>
+                                                <%= sec.title %>
+                                            </h2>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="premium-grid">
+                                    <% sec.products.forEach(product=> { %>
+                                        <div class="premium-card">
+                                            <div class="premium-card-img-wrapper">
+                                                <a href="/product/<%= product._id %>">
+                                                    <% const secThumb = mediaUrl(product.imageUrl, 'thumb'); %>
+                                                    <% const secHover = (product.images && product.images[0] && product.images[0].url) ? mediaUrl(product.images[0].url, 'thumb') : null; %>
+                                                    <img src="<%= secThumb %>" alt="<%= product.name %>"
+                                                        class="primary-img" loading="lazy">
+                                                    <% if (secHover) { %>
+                                                    <img src="<%= secHover %>" alt="<%= product.name %>"
+                                                        class="secondary-img" loading="lazy">
+                                                    <% } %>
+                                                </a>
+                                                <button class="fav-btn" data-id="<%= product._id %>">
+                                                    <i
+                                                        class="<%= (typeof userFavorites !== 'undefined' && userFavorites.includes(product._id.toString())) ? 'fas fa-heart text-danger' : 'far fa-heart' %>"></i>
+                                                </button>
+                                            </div>
+                                            <div class="premium-card-info">
+                                                <div class="premium-card-title"><a href="/product/<%= product._id %>">
+                                                        <%= product.name %>
+                                                    </a></div>
+                                                <div class="premium-card-desc">
+                                                    <%= product.description ? product.description.substring(0,30)
+                                                        + '...' : 'Pırlanta Şıklığı' %>
+                                                </div>
+                                                <div class="premium-card-price-wrap">
+                                                    <span class="premium-card-price">₺ <%=
+                                                            product.price.toLocaleString('tr-TR') %></span>
+                                                    <% if (product.price> 1000) { %>
+                                                        <span class="premium-card-old-price">₺ <%=
+                                                                Math.round(product.price * 1.2).toLocaleString('tr-TR')
+                                                                %></span>
+                                                        <% } %>
+                                                </div>
+                                                <div class="card-actions">
+                                                    <a href="/product/<%= product._id %>" class="btn-premium-secondary"
+                                                        style="padding: 10px; font-size: 10px;">İncele</a>
+                                                    <button
+                                                        onclick="openHomeAddToCartModal('<%= product._id %>', '<%= product.name %>', '<%= product.price %>', '<%= mediaUrl(product.imageUrl, 'thumb') %>')"
+                                                        class="btn-premium-primary"
+                                                        style="padding: 10px; font-size: 10px;">Sepete Ekle</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <% }); %>
+                                </div>
+                            </div>
+                        </div>
+                        <% } %>
+                            <% }); %>
+                                <% } %>
+                                    <!--? Dinamik Özel Reyonlar Bitişi -->
+
+                                    <style>
+                                        /* Custom CSS styling for premium sort dropdown and hidden items */
+                                        .premium-card-hidden {
+                                            display: none !important;
+                                        }
+
+
+                                        #btnShowMore:hover {
+                                            background-color: #c49b45 !important;
+                                            color: #ffffff !important;
+                                            border-color: #c49b45 !important;
+                                            box-shadow: 0 4px 15px rgba(196, 155, 69, 0.4);
+                                            transform: translateY(-2px);
+                                        }
+                                    </style>
+
+
+                                    <script>
+                                        document.addEventListener('DOMContentLoaded', function () {
+                                            const grid = document.getElementById('homeProductGrid');
+                                            const sortSelect = document.getElementById('homeProductSort');
+                                            const btnShowMore = document.getElementById('btnShowMore');
+                                            const showMoreContainer = document.getElementById('showMoreContainer');
+
+                                            let visibleLimit = 16;
+
+                                            function updateVisibility() {
+                                                if (!grid) return;
+                                                const cards = Array.from(grid.querySelectorAll('.premium-card'));
+                                                cards.forEach((card, index) => {
+                                                    if (index < visibleLimit) {
+                                                        card.style.setProperty('display', 'block', 'important');
+                                                        card.classList.remove('premium-card-hidden');
+                                                        card.querySelectorAll('img[data-src]').forEach(img => {
+                                                            if (!img.getAttribute('src')) {
+                                                                img.setAttribute('src', img.getAttribute('data-src'));
+                                                            }
+                                                        });
+                                                    } else {
+                                                        card.style.setProperty('display', 'none', 'important');
+                                                        card.classList.add('premium-card-hidden');
+                                                    }
+                                                });
+
+                                                if (showMoreContainer) {
+                                                    if (visibleLimit >= cards.length) {
+                                                        showMoreContainer.style.setProperty('display', 'none', 'important');
+                                                    } else {
+                                                        showMoreContainer.style.setProperty('display', 'flex', 'important');
+                                                    }
+                                                }
+                                            }
+
+                                            function sortProducts(sortBy) {
+                                                if (!grid) return;
+                                                const cards = Array.from(grid.querySelectorAll('.premium-card'));
+
+                                                cards.sort((a, b) => {
+                                                    if (sortBy === 'price-asc') {
+                                                        return parseFloat(a.dataset.price) - parseFloat(b.dataset.price);
+                                                    } else if (sortBy === 'price-desc') {
+                                                        return parseFloat(b.dataset.price) - parseFloat(a.dataset.price);
+                                                    } else {
+                                                        // newest
+                                                        return parseFloat(b.dataset.date) - parseFloat(a.dataset.date);
+                                                    }
+                                                });
+
+                                                cards.forEach(card => grid.appendChild(card));
+
+                                                visibleLimit = 16;
+                                                updateVisibility();
+                                            }
+
+                                            if (sortSelect) {
+                                                $(sortSelect).on('change', function () {
+                                                    sortProducts(this.value);
+                                                });
+                                            }
+
+                                            if (btnShowMore) {
+                                                btnShowMore.addEventListener('click', function () {
+                                                    visibleLimit += 16;
+                                                    updateVisibility();
+                                                });
+                                            }
+
+                                            updateVisibility();
+                                        });
+
+                                        // Ana sayfa yüzük ölçü tablosu
+                                        const ringSizeChartHome = [
+                                            { size: 7, diameter: 14.96 },
+                                            { size: 8, diameter: 15.28 },
+                                            { size: 9, diameter: 15.61 },
+                                            { size: 10, diameter: 15.92 },
+                                            { size: 11, diameter: 16.24 },
+                                            { size: 12, diameter: 16.56 },
+                                            { size: 13, diameter: 16.88 },
+                                            { size: 14, diameter: 17.20 },
+                                            { size: 15, diameter: 17.52 },
+                                            { size: 16, diameter: 17.83 },
+                                            { size: 17, diameter: 18.15 },
+                                            { size: 18, diameter: 18.47 },
+                                            { size: 19, diameter: 18.79 },
+                                            { size: 20, diameter: 19.11 },
+                                            { size: 21, diameter: 19.43 },
+                                            { size: 22, diameter: 19.75 },
+                                            { size: 23, diameter: 20.06 },
+                                            { size: 24, diameter: 20.38 },
+                                            { size: 25, diameter: 20.70 },
+                                            { size: 26, diameter: 21.02 },
+                                            { size: 27, diameter: 21.34 },
+                                            { size: 28, diameter: 21.66 },
+                                            { size: 29, diameter: 21.97 },
+                                            { size: 30, diameter: 22.29 }
+                                        ];
+
+                                        let currentProduct = null;
+                                        let mcurrentStepHome = 1;
+                                        let mpxPerMmHome = 7.6481;
+                                        let mcalibrationCirclePixelsHome = 200;
+
+                                        // Ana sayfa sepete ekleme modalı
+                                        function openHomeAddToCartModal(productId, productName, productPrice, productImage) {
+                                            currentProduct = {
+                                                _id: productId,
+                                                name: productName,
+                                                price: productPrice,
+                                                imageUrl: productImage
+                                            };
+
+                                            const modal = document.getElementById('addToCartModal');
+                                            const content = document.getElementById('modal-product-content');
+
+                                            // Modal içeriğini doldur
+                                            content.innerHTML = `
+                                                <img src="${productImage}" alt="${productName}" style="width: 120px; height: 120px; object-fit: cover; border-radius: 12px; margin-bottom: 15px;">
+                                                <h3 style="font-size: 18px; font-weight: 700; color: #140C40; margin-bottom: 8px;">${productName}</h3>
+                                                <p style="font-size: 20px; font-weight: 700; color: #ff2020; margin-bottom: 20px;">₺${parseFloat(productPrice).toLocaleString('tr-TR')}</p>
+                                                
+                                                <div class="variation-group" style="text-align: left; margin-bottom: 15px;">
+                                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                                        <span style="font-weight: 600; color: #333;">Yüzük Ölçüsü</span>
+                                                        <a href="javascript:void(0)" onclick="openRingSizeModalHome()" style="font-size: 12px; color: #c5a059; font-weight: 600; text-decoration: underline;"><i class="fas fa-question-circle"></i> Ölçümü Nasıl Bulurum?</a>
+                                                    </div>
+                                                    <select id="selected-size-home" class="premium-select" style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px;">
+                                                        <option value="">Seçiniz</option>
+                                                        ${ringSizeChartHome.map(s => `<option value="${s.size}">${s.size}</option>`).join('')}
+                                                    </select>
+                                                </div>
+                                                
+                                                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                                                    <button onclick="closeAddToCartModal()" class="btn-premium-secondary" style="flex: 1; padding: 12px 20px; font-size: 14px;">İptal</button>
+                                                    <button onclick="addToCartFromHome()" class="btn-premium-primary" style="flex: 1; padding: 12px 20px; font-size: 14px;">Sepete Ekle</button>
+                                                </div>
+                                            `;
+
+                                            modal.style.display = 'flex';
+                                            document.body.style.overflow = 'hidden';
+                                        }
+
+                                        function closeAddToCartModal() {
+                                            const modal = document.getElementById('addToCartModal');
+                                            modal.style.display = 'none';
+                                            document.body.style.overflow = '';
+                                        }
+
+                                        // Ana sayfadan sepete ekleme
+                                        function addToCartFromHome() {
+                                            if (!currentProduct) return;
+
+                                            const sizeSelect = document.getElementById('selected-size-home');
+                                            const selectedSize = sizeSelect.value;
+
+                                            if (!selectedSize) {
+                                                alert('Lütfen bir yüzük ölçüsü seçin!');
+                                                return;
+                                            }
+
+                                            // Form oluşturalım ve POST edelim
+                                            const form = document.createElement('form');
+                                            form.method = 'POST';
+                                            form.action = '/cart/add';
+
+                                            const productIdInput = document.createElement('input');
+                                            productIdInput.type = 'hidden';
+                                            productIdInput.name = 'productId';
+                                            productIdInput.value = currentProduct._id;
+
+                                            const qtyInput = document.createElement('input');
+                                            qtyInput.type = 'hidden';
+                                            qtyInput.name = 'quantity';
+                                            qtyInput.value = '1';
+
+                                            const sizeInput = document.createElement('input');
+                                            sizeInput.type = 'hidden';
+                                            sizeInput.name = 'selectedSize';
+                                            sizeInput.value = selectedSize;
+
+                                            form.appendChild(productIdInput);
+                                            form.appendChild(qtyInput);
+                                            form.appendChild(sizeInput);
+
+                                            document.body.appendChild(form);
+                                            form.submit();
+                                        }
+
+                                        // Ana sayfa yüzük ölçü bulma modalı fonksiyonları
+                                        function openRingSizeModalHome() {
+                                            const modal = document.getElementById('ringSizeModalHome');
+                                            modal.style.display = 'flex';
+                                            document.body.style.overflow = 'hidden';
+
+                                            goToModalStepHome(1);
+
+                                            // Select'i doldur
+                                            const selectEl = document.getElementById('msize-comparator-select-h');
+                                            if (selectEl && selectEl.children.length === 0) {
+                                                ringSizeChartHome.forEach(item => {
+                                                    const option = document.createElement('option');
+                                                    option.value = item.size;
+                                                    option.text = `Ölçü ${item.size} (${item.diameter.toFixed(2)} mm)`;
+                                                    if (item.size === 15) option.selected = true;
+                                                    selectEl.appendChild(option);
+                                                });
+                                            }
+                                        }
+
+                                        function closeRingSizeModalHome() {
+                                            const modal = document.getElementById('ringSizeModalHome');
+                                            modal.style.display = 'none';
+                                            document.body.style.overflow = '';
+                                        }
+
+                                        function goToModalStepHome(step) {
+                                            document.querySelectorAll('#mstep-content-h1, #mstep-content-h2, #mstep-content-h3').forEach(el => el.style.display = 'none');
+                                            document.getElementById(`mstep-content-h${step}`).style.display = 'block';
+
+                                            document.querySelectorAll('#mstep-dot-h1, #mstep-dot-h2, #mstep-dot-h3').forEach((el, index) => {
+                                                const dotNum = index + 1;
+                                                const numEl = el.querySelector('.modal-step-num');
+
+                                                if (dotNum < step) {
+                                                    el.style.color = '#c5a059';
+                                                    if (numEl) {
+                                                        numEl.style.background = '#28a745';
+                                                        numEl.style.color = '#fff';
+                                                        numEl.innerHTML = '<i class="fas fa-check"></i>';
+                                                    }
+                                                } else if (dotNum === step) {
+                                                    el.style.color = '#c5a059';
+                                                    if (numEl) {
+                                                        numEl.style.background = '#c5a059';
+                                                        numEl.style.color = '#fff';
+                                                        numEl.innerHTML = dotNum;
+                                                    }
+                                                } else {
+                                                    el.style.color = '#aaa';
+                                                    if (numEl) {
+                                                        numEl.style.background = '#eee';
+                                                        numEl.style.color = '#888';
+                                                        numEl.innerHTML = dotNum;
+                                                    }
+                                                }
+                                            });
+
+                                            mcurrentStepHome = step;
+
+                                            if (step === 3) {
+                                                calculateModalRingSizeHome(document.getElementById('mring-measure-slider-h').value);
+                                                updateModalComparatorSizeHome(document.getElementById('msize-comparator-select-h').value);
+                                            }
+                                        }
+
+                                        function resizeModalCalibrationCircleHome(px) {
+                                            mcalibrationCirclePixelsHome = parseInt(px);
+                                            const circle = document.getElementById('mcalibration-circle-h');
+                                            circle.style.width = px + 'px';
+                                            circle.style.height = px + 'px';
+                                            document.getElementById('mcal-pixels-label-h').innerText = `Genişlik: ${px}px`;
+                                        }
+
+                                        function tuneModalCalibrationHome(change) {
+                                            const slider = document.getElementById('mcalibration-slider-h');
+                                            let newValue = parseInt(slider.value) + change;
+                                            if (newValue >= 150 && newValue <= 300) {
+                                                slider.value = newValue;
+                                                resizeModalCalibrationCircleHome(newValue);
+                                            }
+                                        }
+
+                                        function saveModalCalibrationAndContinueHome() {
+                                            mpxPerMmHome = mcalibrationCirclePixelsHome / 26.15;
+                                            goToModalStepHome(3);
+                                        }
+
+                                        function switchModalMeasureModeHome(mode) {
+                                            document.getElementById('mmode-content-ring-h').style.display = mode === 'ring' ? 'block' : 'none';
+                                            document.getElementById('mmode-content-circles-h').style.display = mode === 'circles' ? 'block' : 'none';
+                                            document.getElementById('mtab-btn-ring-h').className = 'measure-tab-btn ' + (mode === 'ring' ? 'active' : '');
+                                            document.getElementById('mtab-btn-circles-h').className = 'measure-tab-btn ' + (mode === 'circles' ? 'active' : '');
+                                            if (mode === 'ring') {
+                                                document.getElementById('mtab-btn-ring-h').style.background = '#c5a059';
+                                                document.getElementById('mtab-btn-ring-h').style.color = '#fff';
+                                                document.getElementById('mtab-btn-ring-h').style.borderColor = '#c5a059';
+                                                document.getElementById('mtab-btn-circles-h').style.background = '#fff';
+                                                document.getElementById('mtab-btn-circles-h').style.color = '#555';
+                                                document.getElementById('mtab-btn-circles-h').style.borderColor = '#ccc';
+                                            } else {
+                                                document.getElementById('mtab-btn-circles-h').style.background = '#c5a059';
+                                                document.getElementById('mtab-btn-circles-h').style.color = '#fff';
+                                                document.getElementById('mtab-btn-circles-h').style.borderColor = '#c5a059';
+                                                document.getElementById('mtab-btn-ring-h').style.background = '#fff';
+                                                document.getElementById('mtab-btn-ring-h').style.color = '#555';
+                                                document.getElementById('mtab-btn-ring-h').style.borderColor = '#ccc';
+                                            }
+                                        }
+
+                                        function resizeModalRingMeasureCircleHome(px) {
+                                            const circle = document.getElementById('mring-measure-circle-h');
+                                            circle.style.width = px + 'px';
+                                            circle.style.height = px + 'px';
+                                            calculateModalRingSizeHome(px);
+                                        }
+
+                                        function tuneModalRingMeasureHome(change) {
+                                            const slider = document.getElementById('mring-measure-slider-h');
+                                            let newValue = parseInt(slider.value) + change;
+                                            if (newValue >= 100 && newValue <= 220) {
+                                                slider.value = newValue;
+                                                resizeModalRingMeasureCircleHome(newValue);
+                                            }
+                                        }
+
+                                        function calculateModalRingSizeHome(px) {
+                                            const diameterMm = px / mpxPerMmHome;
+                                            let closestSize = 15;
+                                            let closestDiff = Infinity;
+
+                                            ringSizeChartHome.forEach(item => {
+                                                const diff = Math.abs(item.diameter - diameterMm);
+                                                if (diff < closestDiff) {
+                                                    closestDiff = diff;
+                                                    closestSize = item.size;
+                                                }
+                                            });
+
+                                            document.getElementById('mring-size-result-label-h').innerText = closestSize;
+                                            document.getElementById('mring-diameter-result-label-h').innerText = diameterMm.toFixed(2) + ' mm';
+                                        }
+
+                                        function updateModalComparatorSizeHome(size) {
+                                            const sizeData = ringSizeChartHome.find(s => s.size === parseInt(size));
+                                            if (sizeData) {
+                                                const pxSize = Math.round(sizeData.diameter * mpxPerMmHome);
+                                                const circle = document.getElementById('mring-compare-circle-h');
+                                                circle.style.width = pxSize + 'px';
+                                                circle.style.height = pxSize + 'px';
+                                                document.getElementById('mring-compare-label-h').innerText = size;
+                                                document.getElementById('mring-compare-diameter-label-h').innerText = sizeData.diameter.toFixed(2) + ' mm';
+                                            }
+                                        }
+
+                                        function applyRingSizeToHomeModal() {
+                                            const foundSize = document.getElementById('mring-size-result-label-h').innerText;
+                                            const sizeSelect = document.getElementById('selected-size-home');
+                                            if (sizeSelect) {
+                                                sizeSelect.value = foundSize;
+                                            }
+                                            closeRingSizeModalHome();
+                                        }
+
+                                        // Modal dışına tıklandığında kapat
+                                        window.addEventListener('click', function (event) {
+                                            const addModal = document.getElementById('addToCartModal');
+                                            const sizeModal = document.getElementById('ringSizeModalHome');
+                                            if (event.target === addModal) {
+                                                closeAddToCartModal();
+                                            }
+                                            if (event.target === sizeModal) {
+                                                closeRingSizeModalHome();
+                                            }
+                                        });
+                                    </script>
+
+        </main>
+
+
+        <!-- Ürün Ekleme Modalı -->
+        <div id="addToCartModal" class="ring-size-modal"
+            style="display:none; position:fixed; z-index:1100; left:0; top:0; width:100%; height:100%; overflow:hidden; background-color:rgba(0,0,0,0.6); backdrop-filter: blur(8px); justify-content:center; align-items:center;">
+            <div class="ring-size-modal-content"
+                style="background-color:#ffffff; margin:auto; padding:25px; border-radius:20px; width:90%; max-width:550px; box-shadow:0 20px 50px rgba(0,0,0,0.15); border:1px solid rgba(196,155,69,0.2); position:relative; animation: modalFadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1); max-height: 95vh; overflow-y: auto;">
+                <span class="ring-size-close" onclick="closeAddToCartModal()"
+                    style="color:#aaa; position:absolute; right:20px; top:15px; font-size:28px; font-weight:bold; cursor:pointer; transition:color 0.2s; z-index: 10;">&times;</span>
+
+                <div id="modal-product-content" style="text-align: center;">
+                    <!-- Ürün içeriği burada dinamik olarak doldurulacak -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Yüzük Ölçüsü Bulma Modalı (1 TL Entegrasyonu) - Ana sayfa için kopya -->
+        <div id="ringSizeModalHome" class="ring-size-modal"
+            style="display:none; position:fixed; z-index:1200; left:0; top:0; width:100%; height:100%; overflow:hidden; background-color:rgba(0,0,0,0.6); backdrop-filter: blur(8px); justify-content:center; align-items:center;">
+            <div class="ring-size-modal-content"
+                style="background-color:#ffffff; margin:auto; padding:25px; border-radius:20px; width:90%; max-width:600px; box-shadow:0 20px 50px rgba(0,0,0,0.15); border:1px solid rgba(196,155,69,0.2); position:relative; animation: modalFadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1); min-height: 520px; max-height: 95vh; overflow-y: auto; display: flex; flex-direction: column; justify-content: space-between;">
+                <span class="ring-size-close" onclick="closeRingSizeModalHome()"
+                    style="color:#aaa; position:absolute; right:20px; top:15px; font-size:28px; font-weight:bold; cursor:pointer; transition:color 0.2s; z-index: 10;">&times;</span>
+
+                <!-- Step Indicator -->
+                <div class="modal-wizard-steps"
+                    style="display: flex; justify-content: space-between; margin-bottom: 20px; position: relative; z-index: 2;">
+                    <div class="modal-step-item active" id="mstep-dot-h1"
+                        style="flex: 1; text-align: center; font-size: 11px; font-weight: 700; color: #c5a059;">
+                        <div class="modal-step-num"
+                            style="width: 28px; height: 28px; border-radius: 50%; background: #c5a059; color: #fff; display: flex; align-items: center; justify-content: center; margin: 0 auto 6px; font-weight: bold; font-size: 11px;">
+                            1</div>
+                        Giriş
+                    </div>
+                    <div class="modal-step-item" id="mstep-dot-h2"
+                        style="flex: 1; text-align: center; font-size: 11px; font-weight: 500; color: #aaa;">
+                        <div class="modal-step-num"
+                            style="width: 28px; height: 28px; border-radius: 50%; background: #eee; color: #888; display: flex; align-items: center; justify-content: center; margin: 0 auto 6px; font-weight: bold; font-size: 11px;">
+                            2</div>
+                        Kalibrasyon
+                    </div>
+                    <div class="modal-step-item" id="mstep-dot-h3"
+                        style="flex: 1; text-align: center; font-size: 11px; font-weight: 500; color: #aaa;">
+                        <div class="modal-step-num"
+                            style="width: 28px; height: 28px; border-radius: 50%; background: #eee; color: #888; display: flex; align-items: center; justify-content: center; margin: 0 auto 6px; font-weight: bold; font-size: 11px;">
+                            3</div>
+                        Ölçüm
+                    </div>
+                </div>
+
+                <!-- Step Content 1: Welcome -->
+                <div id="mstep-content-h1" class="mstep-content" style="text-align: center; margin-bottom: 10px;">
+                    <div style="margin-bottom: 15px;">
+                        <img src="/assets/img/logo/custom_logo_v2.png" alt="Logo"
+                            style="max-height: 45px; object-fit: contain;">
+                    </div>
+                    <h3
+                        style="font-size: 18px; font-weight: 700; color: #140C40; margin-bottom: 10px; font-family: 'Montserrat', sans-serif;">
+                        Ölçünüzü Bulmak Çok Kolay!</h3>
+                    <p
+                        style="font-size: 13px; color: #666; line-height: 1.6; margin-bottom: 20px; max-width: 450px; margin-left: auto; margin-right: auto;">
+                        Yüzük ölçünüzü tam olarak tespit etmek için elinizde **fiziksel bir 1 TL madeni para** olması
+                        yeterlidir. Ekranınızı 1 TL ile kalibre ederek yüzüklerinizin iç çapını milimetrik hassasiyetle
+                        ölçeceğiz.
+                    </p>
+                    <div
+                        style="background: #fdfaf4; border-radius: 12px; padding: 12px; border: 1px solid #f6ecdb; max-width: 420px; margin: 0 auto 20px; text-align: left; font-size: 12px; color: #8c7340; line-height: 1.4;">
+                        <i class="fas fa-info-circle"
+                            style="margin-right: 6px; font-size: 14px; vertical-align: middle;"></i> <strong>Nasıl
+                            Çalışır?</strong> Her ekranın piksel yoğunluğu farklıdır. 1 TL madeni paranın sabit olan
+                        <strong>26.15 mm</strong> çapını ekranda eşleyerek cihazınızın piksel ölçeğini tanımlarız.
+                    </div>
+                    <button type="button" class="btn-premium-primary" onclick="goToModalStepHome(2)"
+                        style="max-width: 220px; margin: 0 auto; display: block; border-radius: 30px; padding: 12px 20px; font-size: 12px;">Hemen
+                        Başla</button>
+                </div>
+
+                <!-- Step Content 2: Calibration -->
+                <div id="mstep-content-h2" class="mstep-content" style="display: none; text-align: center;">
+                    <h3
+                        style="font-size: 16px; font-weight: 700; color: #140C40; margin-bottom: 8px; font-family: 'Montserrat', sans-serif;">
+                        Ekran Kalibrasyonu</h3>
+                    <p
+                        style="font-size: 12px; color: #666; line-height: 1.4; margin-bottom: 20px; max-width: 450px; margin-left: auto; margin-right: auto;">
+                        Ekranın üzerine fiziksel bir **1 TL** yerleştirin. Aşağıdaki kaydırıcıyı kullanarak ekrandaki
+                        daireyi **1 TL madeni para ile birebir aynı boyuta** getirin.
+                    </p>
+
+                    <!-- Calibration Interactive Area -->
+                    <div
+                        style="height: 150px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; position: relative;">
+                        <div id="mcalibration-circle-h"
+                            style="width: 200px; height: 200px; border-radius: 50%; background: radial-gradient(circle, rgba(197, 160, 89, 0.15) 0%, rgba(197, 160, 89, 0.45) 100%); border: 3px dashed #c5a059; transition: width 0.05s ease, height 0.05s ease; box-shadow: 0 10px 25px rgba(197,160,89,0.15); display: flex; align-items: center; justify-content: center;">
+                            <div
+                                style="font-size: 10px; font-weight: 700; color: #8c7340; text-shadow: 0 1px 1px #fff; text-transform: uppercase; letter-spacing: 0.5px;">
+                                1 TL Koyun</div>
+                        </div>
+                    </div>
+
+                    <!-- Slider & Fine Tuning Buttons -->
+                    <div style="max-width: 380px; margin: 0 auto 20px;">
+                        <div
+                            style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 8px;">
+                            <button type="button" class="btn-tune" onclick="tuneModalCalibrationHome(-1)"
+                                style="width:32px; height:32px; border-radius:50%; border:1px solid #ccc; background:#fff; font-size:16px; font-weight:bold; color:#555; cursor:pointer; outline:none; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 4px rgba(0,0,0,0.05);">-</button>
+                            <input type="range" id="mcalibration-slider-h" min="150" max="300" value="200"
+                                oninput="resizeModalCalibrationCircleHome(this.value)"
+                                style="flex:1; height:6px; border-radius:5px; background:#e4cc95; outline:none; -webkit-appearance:none; cursor:pointer;">
+                            <button type="button" class="btn-tune" onclick="tuneModalCalibrationHome(1)"
+                                style="width:32px; height:32px; border-radius:50%; border:1px solid #ccc; background:#fff; font-size:16px; font-weight:bold; color:#555; cursor:pointer; outline:none; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 4px rgba(0,0,0,0.05);">+</button>
+                        </div>
+                        <span id="mcal-pixels-label-h"
+                            style="font-size: 11px; color: #999; font-family: monospace;">Genişlik: 200px</span>
+                    </div>
+
+                    <div style="display: flex; gap: 10px; max-width: 360px; margin: 0 auto;">
+                        <button type="button" class="btn-premium-secondary" onclick="goToModalStepHome(1)"
+                            style="border-radius:30px; padding: 10px 20px; font-size: 12px; height: auto;">Geri
+                            Git</button>
+                        <button type="button" class="btn-premium-primary"
+                            onclick="saveModalCalibrationAndContinueHome()"
+                            style="border-radius:30px; padding: 10px 20px; font-size: 12px; height: auto;">Kalibrasyonu
+                            Tamamla</button>
+                    </div>
+                </div>
+
+                <!-- Step Content 3: Measurement -->
+                <div id="mstep-content-h3" class="mstep-content" style="display: none; text-align: center;">
+                    <h3
+                        style="font-size: 16px; font-weight: 700; color: #140C40; margin-bottom: 10px; font-family: 'Montserrat', sans-serif;">
+                        Yüzük Ölçümü Yapın</h3>
+
+                    <!-- Measurement Mode Tabs -->
+                    <div style="display: flex; justify-content: center; gap: 8px; margin-bottom: 20px;">
+                        <button type="button" id="mtab-btn-ring-h" class="measure-tab-btn active"
+                            onclick="switchModalMeasureModeHome('ring')"
+                            style="padding:6px 14px; font-size:11px; font-weight:700; border-radius:20px; border:1px solid #c5a059; background:#c5a059; color:#fff; cursor:pointer; outline:none; transition: all 0.3s;">Mevcut
+                            Yüzük ile Ölç</button>
+                        <button type="button" id="mtab-btn-circles-h" class="measure-tab-btn"
+                            onclick="switchModalMeasureModeHome('circles')"
+                            style="padding:6px 14px; font-size:11px; font-weight:700; border-radius:20px; border:1px solid #ccc; background:#fff; color:#555; cursor:pointer; outline:none; transition: all 0.3s;">Ölçü
+                            Seçip Karşılaştır</button>
+                    </div>
+
+                    <!-- Mode A: Measure Existing Ring -->
+                    <div id="mmode-content-ring-h" style="display: block;">
+                        <p
+                            style="font-size: 12px; color: #666; line-height: 1.4; margin-bottom: 15px; max-width: 450px; margin-left: auto; margin-right: auto;">
+                            Yüzüğünüzü dairenin üzerine koyun. Daireyi yüzüğünüzün **iç metal kenarlarıyla** birebir
+                            hizalayın.
+                        </p>
+
+                        <!-- Ring Interactive Circle Area -->
+                        <div
+                            style="height: 150px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; position: relative;">
+                            <div id="mring-measure-circle-h"
+                                style="width: 140px; height: 140px; border-radius: 50%; border: 2.5px solid #140C40; background: transparent; transition: width 0.05s ease, height 0.05s ease; box-shadow: 0 0 12px rgba(20, 12, 64, 0.12); display: flex; align-items: center; justify-content: center;">
+                                <div
+                                    style="width: 100%; height: 100%; border-radius: 50%; border: 1px dashed #c5a059; opacity: 0.8;">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Result Display Box -->
+                        <div
+                            style="background: #fcf9f2; border: 1px solid #e4cc95; border-radius: 12px; padding: 10px 15px; max-width: 350px; margin: 0 auto 15px; display: flex; align-items: center; justify-content: space-between;">
+                            <div style="text-align: left;">
+                                <span
+                                    style="font-size: 10px; color: #888; text-transform: uppercase; font-weight: bold;">Tahmini
+                                    Ölçünüz</span>
+                                <h4 style="font-size: 22px; font-weight: 800; color: #c5a059; margin: 0;"
+                                    id="mring-size-result-label-h">15</h4>
+                            </div>
+                            <div style="text-align: right; border-left: 1px solid #ede8df; padding-left: 15px;">
+                                <span style="font-size: 10px; color: #888; display: block; font-weight: 600;">İç
+                                    Çap</span>
+                                <span style="font-size: 13px; font-weight: 700; color: #140C40;"
+                                    id="mring-diameter-result-label-h">17.52 mm</span>
+                            </div>
+                        </div>
+
+                        <!-- Ring Slider & Fine Tuning Buttons -->
+                        <div style="max-width: 380px; margin: 0 auto 20px;">
+                            <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+                                <button type="button" class="btn-tune" onclick="tuneModalRingMeasureHome(-1)"
+                                    style="width:32px; height:32px; border-radius:50%; border:1px solid #ccc; background:#fff; font-size:16px; font-weight:bold; color:#555; cursor:pointer; outline:none; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 4px rgba(0,0,0,0.05);">-</button>
+                                <input type="range" id="mring-measure-slider-h" min="100" max="220" value="140"
+                                    oninput="resizeModalRingMeasureCircleHome(this.value)"
+                                    style="flex:1; height:6px; border-radius:5px; background:#c5a059; outline:none; -webkit-appearance:none; cursor:pointer;">
+                                <button type="button" class="btn-tune" onclick="tuneModalRingMeasureHome(1)"
+                                    style="width:32px; height:32px; border-radius:50%; border:1px solid #ccc; background:#fff; font-size:16px; font-weight:bold; color:#555; cursor:pointer; outline:none; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 4px rgba(0,0,0,0.05);">+</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mode B: Choose Size and Display -->
+                    <div id="mmode-content-circles-h" style="display: none;">
+                        <p
+                            style="font-size: 12px; color: #666; line-height: 1.4; margin-bottom: 20px; max-width: 450px; margin-left: auto; margin-right: auto;">
+                            Öğrenmek istediğiniz **yüzük ölçüsünü** seçin. Ekranda tam olarak o ölçünün birebir fiziksel
+                            boyutundaki daire çizilecektir.
+                        </p>
+
+                        <!-- Selection Dropdown -->
+                        <div style="max-width: 260px; margin: 0 auto 20px;">
+                            <select id="msize-comparator-select-h" onchange="updateModalComparatorSizeHome(this.value)"
+                                style="width: 100%; padding: 10px; border: 1px solid #c5a059; border-radius: 8px; font-size: 13px; font-weight: 700; color: #140C40; outline: none; background: #fff; cursor: pointer;">
+                                <!-- Will be populated dynamically -->
+                            </select>
+                        </div>
+
+                        <!-- Comparison Circle Area -->
+                        <div
+                            style="height: 140px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; position: relative;">
+                            <div id="mring-compare-circle-h"
+                                style="width: 140px; height: 140px; border-radius: 50%; border: 3px solid #c5a059; background: radial-gradient(circle, rgba(197,160,89,0.05) 0%, rgba(197,160,89,0.15) 100%); display: flex; align-items: center; justify-content: center; transition: width 0.15s ease, height 0.15s ease;">
+                                <div style="font-size: 16px; font-weight: 800; color: #140C40;"
+                                    id="mring-compare-label-h">15</div>
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom: 15px;">
+                            <span style="font-size: 12px; color: #888; font-weight: 600;">Seçilen Ölçü İç Çapı: <strong
+                                    style="color:#140C40;" id="mring-compare-diameter-label-h">17.52 mm</strong></span>
+                        </div>
+                    </div>
+
+                    <!-- Premium Bilgilendirme ve Uyarı Kutusu -->
+                    <div
+                        style="background: #fafaf9; border: 1px solid #e5dfd5; border-radius: 14px; padding: 16px; margin: 15px auto; max-width: 480px; text-align: left; box-shadow: 0 4px 15px rgba(0,0,0,0.02); display: flex; align-items: flex-start; gap: 14px;">
+                        <img src="/assets/img/logo/custom_logo_v2.png" alt="MI DIAMOND"
+                            style="max-height: 28px; max-width: 55px; object-fit: contain; flex-shrink: 0; margin-top: 2px;">
+                        <div style="font-size: 11px; line-height: 1.6; color: #555; font-family: 'Inter', sans-serif;">
+                            <strong>Önemli Bilgilendirme:</strong> Kalibrasyonu doğru yapıp uygun ölçüyü seçtiğinizde,
+                            sistem %95 doğrulukla yüzük ölçünüzü hesaplar.<br><br>
+                            Emin değilseniz, <strong>"Yeniden Kalibre Et"</strong> butonuna basarak yeniden kalibrasyon
+                            yapabilirsiniz.<br><br>
+                            Ölçüm yöntemi sistemde görüntülenemediğinden, olası hatalardan <strong>MI DIAMOND</strong>
+                            sorumlu değildir.
+                        </div>
+                    </div>
+
+                    <!-- Footer actions -->
+                    <div style="display: flex; gap: 10px; max-width: 360px; margin: 0 auto;">
+                        <button type="button" class="btn-premium-secondary" onclick="goToModalStepHome(2)"
+                            style="border-radius:30px; padding: 10px 20px; font-size: 12px; height: auto;">Yeniden
+                            Kalibre Et</button>
+                        <button type="button" class="btn-premium-primary" onclick="applyRingSizeToHomeModal()"
+                            style="border-radius:30px; padding: 10px 20px; font-size: 12px; height: auto;">Ölçüyü
+                            Uygula</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <%- include('partials/footer') %>

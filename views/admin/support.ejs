@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canlı Destek | MI DIAMOND</title>
+    <link rel="stylesheet" href="/assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/assets/css/fontawesome-all.min.css">
+    <style>
+        body { font-family: 'Poppins', sans-serif; background-color: #f8f9fa; }
+        .sidebar { min-height: 100vh; background: #2c3e50; color: white; padding-top: 20px; }
+        .sidebar a { color: #bdc3c7; display: block; padding: 15px; text-decoration: none; transition: 0.3s; }
+        .sidebar a:hover, .sidebar a.active { background: #34495e; color: white; border-left: 4px solid #d4af37; }
+        .main-content { padding: 30px; }
+        .gold-text { color: #d4af37; }
+        
+        /* Chat Styles */
+        .chat-list-card { height: 80vh; border: none; border-radius: 15px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .chat-main-card { height: 80vh; border: none; border-radius: 15px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .user-item { border-left: 4px solid transparent; transition: 0.2s; }
+        .user-item.active { background: #f8f9fa; border-left-color: #d4af37; }
+        
+        .chat-bubble-wrapper { display: flex; flex-direction: column; margin-bottom: 15px; position: relative; }
+        .chat-bubble { max-width: 75%; padding: 12px 18px; border-radius: 20px; font-size: 14px; position: relative; }
+        .bubble-admin { align-self: flex-end; background: #2c3e50; color: white; border-bottom-right-radius: 2px; }
+        .bubble-user { align-self: flex-start; background: #e9ecef; color: #333; border-bottom-left-radius: 2px; }
+        
+        .message-actions { display: none; position: absolute; top: -20px; gap: 8px; font-size: 12px; }
+        .chat-bubble-wrapper:hover .message-actions { display: flex; }
+        .bubble-admin + .message-actions { right: 0; }
+        .bubble-user + .message-actions { left: 0; }
+        .action-btn { cursor: pointer; color: #888; transition: 0.2s; }
+        .action-btn:hover { color: #d4af37; }
+        .action-btn.delete:hover { color: #ff4757; }
+    </style>
+</head>
+<body>
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-2 sidebar">
+            <h4 class="text-center gold-text mb-4">MI DIAMOND ADMIN</h4>
+            <a href="/admin"><i class="fas fa-tachometer-alt mr-2"></i> Dashboard</a>
+            <a href="/admin/home-settings"><i class="fas fa-home mr-2"></i> Ana Sayfa Yönetimi</a>
+            <a href="/admin/products"><i class="fas fa-gem mr-2"></i> Ürünler</a>
+            <a href="/admin/categories"><i class="fas fa-list mr-2"></i> Kategoriler</a>
+            <a href="/admin/orders"><i class="fas fa-shopping-cart mr-2"></i> Siparişler</a>
+            <a href="/admin/users"><i class="fas fa-users mr-2"></i> Kullanıcılar</a>
+            <a href="/admin/support" class="active"><i class="fas fa-comments mr-2"></i> Canlı Destek</a>
+            <a href="/admin/banners"><i class="fas fa-image mr-2"></i> Bannerlar</a>
+            <a href="/"><i class="fas fa-external-link-alt mr-2"></i> Siteye Git</a>
+            <a href="/auth/logout" class="mt-5 text-danger"><i class="fas fa-sign-out-alt mr-2"></i> Çıkış Yap</a>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-md-10 main-content">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>Canlı Destek</h2>
+                <button id="end-chat-btn" class="btn btn-outline-danger" style="display: none;" onclick="endChatSession()">Sohbeti Sonlandır</button>
+            </div>
+            
+            <div class="row">
+                <!-- User List -->
+                <div class="col-md-4">
+                    <div class="card chat-list-card">
+                        <div class="card-header bg-white py-3">
+                            <h6 class="mb-0 font-weight-bold">Mesajlar</h6>
+                        </div>
+                        <div class="list-group list-group-flush overflow-auto" id="user-list">
+                            <% users.forEach(user => { %>
+                                <button onclick="loadUserChat('<%= user._id %>')" class="list-group-item list-group-item-action user-item d-flex align-items-center gap-3 py-3">
+                                    <div class="rounded-circle bg-gold d-flex align-items-center justify-content-center text-white" style="width: 40px; height: 40px; background-color: #d4af37;">
+                                        <%= (user.fullName || user.name || 'U').substring(0,1).toUpperCase() %>
+                                    </div>
+                                    <div class="ml-3">
+                                        <h6 class="mb-0"><%= user.fullName || user.name %></h6>
+                                        <small class="text-muted"><%= user.email %></small>
+                                    </div>
+                                </button>
+                            <% }) %>
+                            <% if (users.length === 0) { %>
+                                <div class="p-4 text-center text-muted">Henüz mesaj yok.</div>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chat Window -->
+                <div class="col-md-8">
+                    <div class="card chat-main-card">
+                        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                            <h6 class="mb-0 font-weight-bold" id="chat-user-name">Sohbet Seçin</h6>
+                            <span class="badge badge-success" id="user-status" style="display: none;">Aktif</span>
+                        </div>
+                        
+                        <div class="card-body bg-light overflow-auto d-flex flex-column p-4" id="admin-chat-messages">
+                            <div class="text-center text-muted my-auto">
+                                <i class="fas fa-comments fa-4x mb-3 text-light"></i><br>
+                                Yazışmaları görmek için soldan bir kullanıcı seçin.
+                            </div>
+                        </div>
+
+                        <div class="card-footer bg-white p-3" id="admin-chat-footer" style="display: none;">
+                            <div class="input-group">
+                                <input type="hidden" id="current-user-id">
+                                <input type="text" id="admin-chat-input" class="form-control border-0 bg-light" placeholder="Yanıtınızı buraya yazın..." style="border-radius: 20px;" onkeypress="if(event.key==='Enter') sendAdminMessage()">
+                                <div class="input-group-append ml-2">
+                                    <button class="btn btn-dark" style="border-radius: 50%; width: 40px; height: 40px;" onclick="sendAdminMessage()"><i class="fas fa-paper-plane"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/assets/js/vendor/jquery-1.12.4.min.js"></script>
+<script src="/assets/js/bootstrap.min.js"></script>
+
+<script>
+    let activeChatUserId = null;
+
+    async function loadUserChat(userId) {
+        activeChatUserId = userId;
+        document.getElementById('current-user-id').value = userId;
+        document.getElementById('admin-chat-footer').style.display = 'block';
+        document.getElementById('end-chat-btn').style.display = 'block';
+        
+        document.querySelectorAll('.user-item').forEach(item => item.classList.remove('active'));
+        // Find button and add active
+        event?.currentTarget?.classList.add('active');
+
+        try {
+            const res = await fetch(`/admin/support/messages/${userId}`);
+            const data = await res.json();
+            
+            if (data.success) {
+                document.getElementById('chat-user-name').innerText = data.user.fullName || data.user.name;
+                document.getElementById('user-status').style.display = 'inline-block';
+                
+                renderMessages(data.messages);
+            }
+        } catch (e) { console.error(e); }
+    }
+
+    function renderMessages(messages) {
+        const container = document.getElementById('admin-chat-messages');
+        const scrollPos = container.scrollTop;
+        const wasAtBottom = container.scrollHeight - container.scrollTop <= container.clientHeight + 50;
+
+        container.innerHTML = '';
+        messages.forEach(msg => {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'chat-bubble-wrapper';
+            
+            wrapper.innerHTML = `
+                <div class="chat-bubble ${msg.isAdminSender ? 'bubble-admin' : 'bubble-user'}">
+                    ${msg.content}
+                </div>
+                <div class="message-actions">
+                    <span class="action-btn" onclick="editMessage('${msg._id}', '${msg.content}')"><i class="fas fa-edit"></i></span>
+                    <span class="action-btn delete" onclick="deleteMessage('${msg._id}')"><i class="fas fa-trash"></i></span>
+                </div>
+            `;
+            container.appendChild(wrapper);
+        });
+        
+        if (wasAtBottom) {
+            container.scrollTop = container.scrollHeight;
+        } else {
+            container.scrollTop = scrollPos;
+        }
+    }
+
+    async function sendAdminMessage() {
+        const input = document.getElementById('admin-chat-input');
+        const userId = document.getElementById('current-user-id').value;
+        const content = input.value.trim();
+        if (!content || !userId) return;
+
+        input.value = '';
+        try {
+            const res = await fetch('/admin/support/send', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId, content })
+            });
+            const data = await res.json();
+            if (data.success) {
+                loadUserChat(userId);
+            }
+        } catch (e) { console.error(e); }
+    }
+
+    async function deleteMessage(msgId) {
+        if (!confirm('Bu mesajı silmek istediğinize emin misiniz?')) return;
+        try {
+            const res = await fetch(`/admin/support/message/${msgId}`, { method: 'DELETE' });
+            const data = await res.json();
+            if (data.success) loadUserChat(activeChatUserId);
+        } catch (e) { console.error(e); }
+    }
+
+    async function editMessage(msgId, oldContent) {
+        const newContent = prompt('Mesajı düzenleyin:', oldContent);
+        if (!newContent || newContent === oldContent) return;
+        try {
+            const res = await fetch(`/admin/support/message/${msgId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ content: newContent })
+            });
+            const data = await res.json();
+            if (data.success) loadUserChat(activeChatUserId);
+        } catch (e) { console.error(e); }
+    }
+
+    async function endChatSession() {
+        if (!confirm('Sohbeti sonlandırmak istediğinize emin misiniz? Tüm mesajlar silinecek ve müşteri geçmişi göremeyecektir.')) return;
+        try {
+            const res = await fetch(`/admin/support/end-chat/${activeChatUserId}`, { method: 'POST' });
+            const data = await res.json();
+            if (data.success) {
+                alert('Sohbet sonlandırıldı.');
+                window.location.reload();
+            }
+        } catch (e) { console.error(e); }
+    }
+
+    setInterval(() => {
+        if (activeChatUserId) {
+            fetch(`/admin/support/messages/${activeChatUserId}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) renderMessages(data.messages);
+                });
+        }
+    }, 5000);
+</script>
+
+</body>
+</html>

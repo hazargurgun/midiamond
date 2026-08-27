@@ -1,0 +1,413 @@
+<%- include('partials/head') %>
+<%- include('partials/header') %>
+
+<main>
+    <!-- Hero Area Start-->
+    <div class="slider-area ">
+        <div class="single-slider slider-height2 d-flex align-items-center">
+            <div class="container">
+                <div class="row">
+                    <div class="col-xl-12">
+                        <div class="hero-cap text-center">
+                            <h2><%= pageTitle %></h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Hero Area End-->
+    
+    <!-- Latest Products Start -->
+    <section class="latest-product-area padding-bottom">
+        <div class="container-fluid px-4">
+            <div class="row">
+                <!-- Filtre Sidebar -->
+                <div class="col-lg-3 col-md-4 mb-4">
+                    <% 
+                    let activeCount = 0;
+                    if (activeFilters) {
+                        if (activeFilters.ara) activeCount++;
+                        if (activeFilters.karat) activeCount++;
+                        if (activeFilters.renk) activeCount++;
+                        if (activeFilters.berraklik) activeCount++;
+                        if (activeFilters.kesim) activeCount++;
+                        if (activeFilters.metal) activeCount++;
+                        if (activeFilters.sertifika) activeCount++;
+                    }
+                    %>
+                    <!-- Mobile Filter Trigger Button -->
+                    <button type="button" id="mobileFilterBtn" class="btn-premium-filter-trigger">
+                        <i class="fas fa-sliders-h"></i> Filtrele <%= activeCount > 0 ? '(' + activeCount + ')' : '' %>
+                    </button>
+                    
+                    <!-- Mobile Filter Backdrop Drawer -->
+                    <div id="filterDrawerBackdrop" class="filter-drawer-backdrop"></div>
+                    
+                    <div class="premium-filter-sidebar">
+                        <!-- Drawer Header (visible on mobile only) -->
+                        <div class="filter-drawer-header">
+                            <h5 class="filter-header-title">🔍 Filtreler</h5>
+                            <button type="button" id="closeFilterBtn" class="filter-drawer-close-btn">&times;</button>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="filter-header-title d-none d-lg-flex">🔍 Filtreler</h5>
+                            <a href="/shop" class="filter-clear-link">Temizle</a>
+                        </div>
+                        <form method="GET" action="/shop" id="filterForm">
+                            <!-- Arama -->
+                            <div class="filter-group">
+                                <label class="filter-group-label">Ürün Ara</label>
+                                <div class="premium-search-wrapper">
+                                    <input type="text" name="ara" class="premium-search-input" placeholder="İsim veya ürün kodu..." value="<%= activeFilters && activeFilters.ara ? activeFilters.ara : '' %>">
+                                    <button class="premium-search-btn" type="submit"><i class="fas fa-search"></i></button>
+                                </div>
+                            </div>
+                            
+                            <!-- Karat Aralığı -->
+                            <div class="filter-group">
+                                <label class="filter-group-label">💎 Karat Ağırlığı</label>
+                                <div class="premium-radio-list">
+                                    <label class="premium-radio-container">
+                                        <input type="radio" name="karat" id="karatAll" value="" onchange="this.form.submit()" <%= !activeFilters || !activeFilters.karat ? 'checked' : '' %>>
+                                        <span class="premium-radio-checkmark"></span>
+                                        <span>Tümü</span>
+                                    </label>
+                                    <label class="premium-radio-container">
+                                        <input type="radio" name="karat" id="karatUnder" value="under0.5" onchange="this.form.submit()" <%= activeFilters && activeFilters.karat === 'under0.5' ? 'checked' : '' %>>
+                                        <span class="premium-radio-checkmark"></span>
+                                        <span>0.50 ct altı</span>
+                                    </label>
+                                    <label class="premium-radio-container">
+                                        <input type="radio" name="karat" id="karatMid" value="0.5-1" onchange="this.form.submit()" <%= activeFilters && activeFilters.karat === '0.5-1' ? 'checked' : '' %>>
+                                        <span class="premium-radio-checkmark"></span>
+                                        <span>0.50 – 1.00 ct</span>
+                                    </label>
+                                    <label class="premium-radio-container">
+                                        <input type="radio" name="karat" id="karatPlus" value="1plus" onchange="this.form.submit()" <%= activeFilters && activeFilters.karat === '1plus' ? 'checked' : '' %>>
+                                        <span class="premium-radio-checkmark"></span>
+                                        <span>1.00 ct ve üzeri</span>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <!-- Taş Rengi -->
+                            <div class="filter-group">
+                                <label class="filter-group-label">Taş Rengi</label>
+                                <div class="premium-tags-grid">
+                                    <label class="premium-tag-container">
+                                        <input type="radio" name="renk" id="renkAll" value="" onchange="this.form.submit()" <%= !activeFilters || !activeFilters.renk ? 'checked' : '' %>>
+                                        <span class="premium-tag-box">Tümü</span>
+                                    </label>
+                                    <% ['D','E','F','G','H'].forEach(r => { %>
+                                    <label class="premium-tag-container">
+                                        <input type="radio" name="renk" id="renk<%= r %>" value="<%= r %>" onchange="this.form.submit()" <%= activeFilters && activeFilters.renk === r ? 'checked' : '' %>>
+                                        <span class="premium-tag-box"><%= r %></span>
+                                    </label>
+                                    <% }); %>
+                                </div>
+                            </div>
+                            
+                            <!-- Berraklık -->
+                            <div class="filter-group">
+                                <label class="filter-group-label">Berraklık</label>
+                                <div class="premium-radio-list">
+                                    <label class="premium-radio-container">
+                                        <input type="radio" name="berraklik" id="berraklikAll" value="" onchange="this.form.submit()" <%= !activeFilters || !activeFilters.berraklik ? 'checked' : '' %>>
+                                        <span class="premium-radio-checkmark"></span>
+                                        <span>Tümü</span>
+                                    </label>
+                                    <% ['IF','VVS1','VVS2','VS1','VS2'].forEach(b => { %>
+                                    <label class="premium-radio-container">
+                                        <input type="radio" name="berraklik" id="berraklik<%= b %>" value="<%= b %>" onchange="this.form.submit()" <%= activeFilters && activeFilters.berraklik === b ? 'checked' : '' %>>
+                                        <span class="premium-radio-checkmark"></span>
+                                        <span><%= b %></span>
+                                    </label>
+                                    <% }); %>
+                                </div>
+                            </div>
+                            
+                            <!-- Kesim -->
+                            <div class="filter-group">
+                                <label class="filter-group-label">Kesim / Şekil</label>
+                                <div class="premium-radio-list">
+                                    <label class="premium-radio-container">
+                                        <input type="radio" name="kesim" id="kesimAll" value="" onchange="this.form.submit()" <%= !activeFilters || !activeFilters.kesim ? 'checked' : '' %>>
+                                        <span class="premium-radio-checkmark"></span>
+                                        <span>Tümü</span>
+                                    </label>
+                                    <% ['Round','Marquise','Oval','Princess','Pear','Emerald','Cushion','Heart','Radiant'].forEach(k => { %>
+                                    <label class="premium-radio-container">
+                                        <input type="radio" name="kesim" id="kesim<%= k %>" value="<%= k %>" onchange="this.form.submit()" <%= activeFilters && activeFilters.kesim === k ? 'checked' : '' %>>
+                                        <span class="premium-radio-checkmark"></span>
+                                        <span><%= k %></span>
+                                    </label>
+                                    <% }); %>
+                                </div>
+                            </div>
+                            
+                            <!-- Maden -->
+                            <div class="filter-group">
+                                <label class="filter-group-label">Maden</label>
+                                <div class="premium-radio-list">
+                                    <label class="premium-radio-container">
+                                        <input type="radio" name="metal" id="metalAll" value="" onchange="this.form.submit()" <%= !activeFilters || !activeFilters.metal ? 'checked' : '' %>>
+                                        <span class="premium-radio-checkmark"></span>
+                                        <span>Tümü</span>
+                                    </label>
+                                    <% [['14k Altın','14k-altin'],['18k Altın','18k-altin'],['Gümüş','gumus'],['Platin','platin']].forEach(m => { %>
+                                    <label class="premium-radio-container">
+                                        <input type="radio" name="metal" id="metal<%= m[1] %>" value="<%= m[0] %>" onchange="this.form.submit()" <%= activeFilters && activeFilters.metal === m[0] ? 'checked' : '' %>>
+                                        <span class="premium-radio-checkmark"></span>
+                                        <span><%= m[0] %></span>
+                                    </label>
+                                    <% }); %>
+                                </div>
+                            </div>
+                            
+                            <!-- Sertifika -->
+                            <div class="filter-group">
+                                <label class="filter-group-label">Sertifika</label>
+                                <div class="premium-radio-list">
+                                    <label class="premium-radio-container">
+                                        <input type="radio" name="sertifika" id="sertifikaAll" value="" onchange="this.form.submit()" <%= !activeFilters || !activeFilters.sertifika ? 'checked' : '' %>>
+                                        <span class="premium-radio-checkmark"></span>
+                                        <span>Tümü</span>
+                                    </label>
+                                    <% ['IGI','GIA','HRD'].forEach(s => { %>
+                                    <label class="premium-radio-container">
+                                        <input type="radio" name="sertifika" id="sertifika<%= s %>" value="<%= s %>" onchange="this.form.submit()" <%= activeFilters && activeFilters.sertifika === s ? 'checked' : '' %>>
+                                        <span class="premium-radio-checkmark"></span>
+                                        <span><%= s %></span>
+                                    </label>
+                                    <% }); %>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <!-- Ürün Listesi -->
+                <div class="col-lg-9 col-md-8">
+                    <!-- Kategori Sekmeleri -->
+                    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                        <nav>
+                            <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                                <a class="nav-item nav-link <%= currentCategory === 'Hepsi' ? 'active' : '' %>" href="/shop">Hepsi</a>
+                                <% categories.forEach(cat => { %>
+                                    <a class="nav-item nav-link <%= currentCategory === cat.slug ? 'active' : '' %>" href="/kategori/<%= cat.slug %>"><%= cat.name %></a>
+                                <% }); %>
+                            </div>
+                        </nav>
+                        <span class="text-muted" style="font-size:13px;"><%= products.length %> ürün bulundu</span>
+                    </div>
+
+            <!-- Nav Card -->
+            <div class="tab-content" id="nav-tabContent">
+                <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
+                    <style>
+                        .sharp-product-img {
+                            border-radius: 0 !important;
+                            border: 1px solid #e0e0e0;
+                            box-shadow: none !important;
+                            width: 100%;
+                            height: 380px;
+                            object-fit: cover;
+                        }
+                        .category-section-title {
+                            width: 100%;
+                            border-bottom: 2px solid #1a1a1a;
+                            padding-bottom: 10px;
+                            margin-bottom: 15px;
+                            margin-top: 60px;
+                            font-weight: 700;
+                            font-family: 'Inter', sans-serif;
+                            color: #1a1a1a;
+                            text-transform: uppercase;
+                            letter-spacing: 1px;
+                        }
+                        .row:first-child .category-section-title {
+                            margin-top: 0;
+                        }
+                        .popular-caption h3 a {
+                            color: #1a1a1a;
+                            transition: color 0.3s;
+                        }
+                        .popular-caption h3 a:hover {
+                            color: #ff2020;
+                        }
+                    </style>
+
+                    <% if (products && products.length > 0) { %>
+                        <% if (currentCategory === 'Hepsi') { %>
+                            <% categories.forEach(cat => { %>
+                                <% const catProducts = products.filter(p => (p.categories && p.categories.some(c => (c._id ? c._id.toString() : c.toString()) === cat._id.toString())) || (p.category && p.category._id && p.category._id.toString() === cat._id.toString())); %>
+                                <% if (catProducts.length > 0) { %>
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <h3 class="category-section-title"><%= cat.name %></h3>
+                                        </div>
+                                    </div>
+                                    <div class="premium-grid">
+                                        <% catProducts.forEach(product => { %>
+                                            
+                    <div class="premium-card wow fadeInUp" data-wow-duration="1s" data-wow-delay=".1s">
+                        <div class="premium-card-img-wrapper">
+                            <a href="/product/<%= product._id %>">
+                                <img src="<%= mediaUrl(product.imageUrl, 'thumb') %>" alt="<%= product.name %>" class="primary-img" loading="lazy">
+                                <% if (product.images && product.images[0] && product.images[0].url) { %>
+                                <img src="<%= mediaUrl(product.images[0].url, 'thumb') %>" alt="<%= product.name %>" class="secondary-img" loading="lazy">
+                                <% } %>
+                            </a>
+                            <button class="fav-btn" data-id="<%= product._id %>">
+                                <i class="<%= (typeof userFavorites !== 'undefined' && userFavorites.includes(product._id.toString())) ? 'fas fa-heart text-danger' : 'far fa-heart' %>"></i>
+                            </button>
+                        </div>
+                        <div class="premium-card-info">
+                            <div class="premium-card-title"><a href="/product/<%= product._id %>"><%= product.name %></a></div>
+                            <div class="premium-card-desc"><%= product.description ? product.description.substring(0,30) + '...' : 'Pırlanta Şıklığı' %></div>
+                            <div class="premium-card-price-wrap">
+                                <span class="premium-card-price">₺ <%= product.price.toLocaleString('tr-TR') %></span>
+                                <% if (product.price > 1000) { %>
+                                    <span class="premium-card-old-price">₺ <%= Math.round(product.price * 1.2).toLocaleString('tr-TR') %></span>
+                                <% } %>
+                            </div>
+                            <div class="card-actions">
+                                <a href="/product/<%= product._id %>" class="btn-premium-secondary" style="padding: 10px; font-size: 10px;">İncele</a>
+                                <button onclick="window.location.href='/product/<%= product._id %>'" class="btn-premium-primary" style="padding: 10px; font-size: 10px;">Sepete Ekle</button>
+                            </div>
+                        </div>
+                    </div>
+                                        <% }); %>
+                                    </div>
+                                <% } %>
+                            <% }); %>
+                            
+                            <% /* Kategori atanmamış ürünler (Eğer varsa) */ %>
+                            <% const uncatProducts = products.filter(p => !(p.categories && p.categories.length > 0) && !p.category); %>
+                            <% if (uncatProducts.length > 0) { %>
+                                <div class="row">
+                                    <div class="col-12">
+                                        <h3 class="category-section-title">Diğer Ürünler</h3>
+                                    </div>
+                                </div>
+                                <div class="premium-grid">
+                                    <% uncatProducts.forEach(product => { %>
+                                        
+                    <div class="premium-card wow fadeInUp" data-wow-duration="1s" data-wow-delay=".1s">
+                        <div class="premium-card-img-wrapper">
+                            <a href="/product/<%= product._id %>">
+                                <img src="<%= mediaUrl(product.imageUrl, 'thumb') %>" alt="<%= product.name %>" class="primary-img" loading="lazy">
+                                <% if (product.images && product.images[0] && product.images[0].url) { %>
+                                <img src="<%= mediaUrl(product.images[0].url, 'thumb') %>" alt="<%= product.name %>" class="secondary-img" loading="lazy">
+                                <% } %>
+                            </a>
+                            <button class="fav-btn" data-id="<%= product._id %>">
+                                <i class="<%= (typeof userFavorites !== 'undefined' && userFavorites.includes(product._id.toString())) ? 'fas fa-heart text-danger' : 'far fa-heart' %>"></i>
+                            </button>
+                        </div>
+                        <div class="premium-card-info">
+                            <div class="premium-card-title"><a href="/product/<%= product._id %>"><%= product.name %></a></div>
+                            <div class="premium-card-desc"><%= product.description ? product.description.substring(0,30) + '...' : 'Pırlanta Şıklığı' %></div>
+                            <div class="premium-card-price-wrap">
+                                <span class="premium-card-price">₺ <%= product.price.toLocaleString('tr-TR') %></span>
+                                <% if (product.price > 1000) { %>
+                                    <span class="premium-card-old-price">₺ <%= Math.round(product.price * 1.2).toLocaleString('tr-TR') %></span>
+                                <% } %>
+                            </div>
+                            <div class="card-actions">
+                                <a href="/product/<%= product._id %>" class="btn-premium-secondary" style="padding: 10px; font-size: 10px;">İncele</a>
+                                <button onclick="window.location.href='/product/<%= product._id %>'" class="btn-premium-primary" style="padding: 10px; font-size: 10px;">Sepete Ekle</button>
+                            </div>
+                        </div>
+                    </div>
+                                    <% }); %>
+                                </div>
+                            <% } %>
+                            
+                        <% } else { %>
+                            <div class="premium-grid">
+                                <% products.forEach(product => { %>
+                                    
+                    <div class="premium-card wow fadeInUp" data-wow-duration="1s" data-wow-delay=".1s">
+                        <div class="premium-card-img-wrapper">
+                            <a href="/product/<%= product._id %>">
+                                <img src="<%= mediaUrl(product.imageUrl, 'thumb') %>" alt="<%= product.name %>" class="primary-img" loading="lazy">
+                                <% if (product.images && product.images[0] && product.images[0].url) { %>
+                                <img src="<%= mediaUrl(product.images[0].url, 'thumb') %>" alt="<%= product.name %>" class="secondary-img" loading="lazy">
+                                <% } %>
+                            </a>
+                            <button class="fav-btn" data-id="<%= product._id %>">
+                                <i class="<%= (typeof userFavorites !== 'undefined' && userFavorites.includes(product._id.toString())) ? 'fas fa-heart text-danger' : 'far fa-heart' %>"></i>
+                            </button>
+                        </div>
+                        <div class="premium-card-info">
+                            <div class="premium-card-title"><a href="/product/<%= product._id %>"><%= product.name %></a></div>
+                            <div class="premium-card-desc"><%= product.description ? product.description.substring(0,30) + '...' : 'Pırlanta Şıklığı' %></div>
+                            <div class="premium-card-price-wrap">
+                                <span class="premium-card-price">₺ <%= product.price.toLocaleString('tr-TR') %></span>
+                                <% if (product.price > 1000) { %>
+                                    <span class="premium-card-old-price">₺ <%= Math.round(product.price * 1.2).toLocaleString('tr-TR') %></span>
+                                <% } %>
+                            </div>
+                            <div class="card-actions">
+                                <a href="/product/<%= product._id %>" class="btn-premium-secondary" style="padding: 10px; font-size: 10px;">İncele</a>
+                                <button onclick="window.location.href='/product/<%= product._id %>'" class="btn-premium-primary" style="padding: 10px; font-size: 10px;">Sepete Ekle</button>
+                            </div>
+                        </div>
+                    </div>
+                                <% }); %>
+                            </div>
+                        <% } %>
+                    <% } else { %>
+                        <div class="row">
+                            <div class="col-12 text-center py-5">
+                                <i class="fas fa-box-open" style="font-size: 60px; color: #ddd; margin-bottom: 20px;"></i>
+                                <h3 style="font-weight: 700; color: #555;">Arama kriterlerine uygun ürün bulunamadı.</h3>
+                                <a href="/shop" class="btn btn-dark mt-3">Tüm Ürünleri Gör</a>
+                            </div>
+                        </div>
+                    <% } %>
+                </div><!-- /tab-content -->
+            </div><!-- /col-lg-9 ürün listesi -->
+        </div><!-- /row -->
+        </div><!-- /container-fluid -->
+    </section>
+    <!-- Latest Products End -->
+    
+    <!-- Mobile Filter Drawer JavaScript -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const mobileFilterBtn = document.getElementById('mobileFilterBtn');
+        const closeFilterBtn = document.getElementById('closeFilterBtn');
+        const filterSidebar = document.querySelector('.premium-filter-sidebar');
+        const filterBackdrop = document.getElementById('filterDrawerBackdrop');
+
+        if (mobileFilterBtn && filterSidebar && filterBackdrop) {
+            mobileFilterBtn.addEventListener('click', function() {
+                filterSidebar.classList.add('active');
+                filterBackdrop.classList.add('active');
+                document.body.style.overflow = 'hidden'; // prevent background scrolling
+            });
+        }
+
+        function closeDrawer() {
+            if (filterSidebar && filterBackdrop) {
+                filterSidebar.classList.remove('active');
+                filterBackdrop.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        }
+
+        if (closeFilterBtn) {
+            closeFilterBtn.addEventListener('click', closeDrawer);
+        }
+
+        if (filterBackdrop) {
+            filterBackdrop.addEventListener('click', closeDrawer);
+        }
+    });
+    </script>
+</main>
+
+<%- include('partials/footer') %>

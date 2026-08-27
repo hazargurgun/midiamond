@@ -1,0 +1,1028 @@
+<%- include('partials/head') %>
+<%- include('partials/header') %>
+
+<main>
+    <!-- Hero Area Start-->
+    <div class="slider-area ">
+        <div class="single-slider slider-height2 d-flex align-items-center">
+            <div class="container">
+                <div class="row">
+                    <div class="col-xl-12">
+                        <div class="hero-cap text-center">
+                            <h2>Ürün Detayı</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Hero Area End-->
+
+    <style>
+        .product-detail-wrapper {
+            background: #ffffff;
+            border-radius: 24px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.06);
+            padding: 50px;
+            margin: -50px auto 50px;
+            position: relative;
+            z-index: 10;
+        }
+        .product-img-box {
+            text-align: center;
+        }
+        .product-img-box img {
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            max-height: 550px;
+            width: 100%;
+            object-fit: contain;
+            background: #f9f9f9;
+        }
+        .product-img-box img:hover {
+            transform: scale(1.03);
+        }
+        .product-info-box {
+            padding-left: 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            height: 100%;
+        }
+        @media (max-width: 991px) {
+            .product-info-box {
+                padding-left: 0;
+                margin-top: 40px;
+            }
+            .product-detail-wrapper {
+                padding: 30px;
+            }
+        }
+        .product-info-box h3 {
+            font-size: 2.8rem;
+            font-weight: 800;
+            color: #1a1a1a;
+            margin-bottom: 15px;
+            letter-spacing: -1px;
+            font-family: 'Inter', sans-serif;
+        }
+        .product-info-box .price {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #ff2020;
+            margin-bottom: 25px;
+            display: inline-block;
+            background: rgba(255, 32, 32, 0.08);
+            padding: 5px 20px;
+            border-radius: 50px;
+        }
+        .product-info-box p {
+            font-size: 1.15rem;
+            line-height: 1.8;
+            color: #555;
+            margin-bottom: 40px;
+            font-family: 'Inter', sans-serif;
+        }
+        .action-group {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .qty-selector {
+            display: flex;
+            align-items: center;
+            border: 2px solid #e1e1e1;
+            border-radius: 50px;
+            padding: 8px 20px;
+            background: #fff;
+        }
+        .qty-selector input {
+            width: 40px;
+            text-align: center;
+            border: none;
+            background: transparent;
+            font-weight: 700;
+            font-size: 1.3rem;
+            color: #1a1a1a;
+            outline: none;
+        }
+        .qty-selector button {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: #888;
+            transition: color 0.2s;
+            outline: none;
+        }
+        .qty-selector button:hover {
+            color: #ff2020;
+        }
+        .btn-buy-now {
+            background: #1a1a1a;
+            color: #fff;
+            border-radius: 50px;
+            padding: 16px 35px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            letter-spacing: 0.5px;
+            border: none;
+            transition: all 0.3s;
+            flex: 1;
+            text-align: center;
+            cursor: pointer;
+            min-width: 180px;
+        }
+        .btn-buy-now:hover {
+            background: #ff2020;
+            color: #fff;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255,32,32,0.25);
+        }
+        .btn-add-cart {
+            background: #fff;
+            color: #1a1a1a;
+            border: 2px solid #1a1a1a;
+            border-radius: 50px;
+            padding: 14px 35px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            letter-spacing: 0.5px;
+            transition: all 0.3s;
+            flex: 1;
+            text-align: center;
+            cursor: pointer;
+            min-width: 180px;
+        }
+        .btn-add-cart:hover {
+            background: #1a1a1a;
+            color: #fff;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+        @media (max-width: 767px) {
+            .pdp-main-image {
+                cursor: default !important;
+            }
+        }
+    </style>
+
+    
+    <!--? Product Details Start -->
+    <section class="product_details section_padding" style="background-color: #ffffff;">
+        <div class="pdp-wrapper">
+            <div class="row">
+                                <!-- LEFT COLUMN: GALLERY -->
+                <div class="col-lg-7">
+                    <div class="pdp-gallery-col">
+                        <!-- Main Image / Video Area -->
+                        <div class="pdp-main-image" id="main-image-container" onmousemove="zoomImage(event)" onmouseleave="resetZoom()">
+                            <img src="<%= mediaUrl(product.imageUrl, 'large') %>" id="main-product-image" alt="<%= product.name %>" ondblclick="openLargePhoto(this.src)" ontouchstart="handleImageTap(event, this.src)">
+                            <video id="main-product-video" controls playsinline webkit-playsinline preload="metadata" style="display:none; width: 100%; height: auto; max-height: 600px; object-fit: contain;"></video>
+                            
+                            <!-- Slider Nav Buttons -->
+                            <button class="slider-btn prev-btn" onclick="prevImage()"><i class="fas fa-chevron-left"></i></button>
+                            <button class="slider-btn next-btn" onclick="nextImage()"><i class="fas fa-chevron-right"></i></button>
+                        </div>
+                        
+                        <!-- Thumbnails -->
+                        <div class="pdp-thumbnails" id="pdp-thumb-list">
+                            <!-- Main Image as first thumb -->
+                            <div class="pdp-thumb active media-thumb" onclick="changeMedia(this, '<%= mediaUrl(product.imageUrl, 'large') %>', 'image')">
+                                <img src="<%= mediaUrl(product.imageUrl, 'thumb') %>" alt="">
+                            </div>
+                            <!-- Combined & Sorted DB Images & Video -->
+                            <% 
+                              let allMedia = [];
+                              if (product.images && product.images.length > 0) {
+                                  product.images.forEach(img => {
+                                      allMedia.push({ type: 'image', url: img.url, order: img.order || 0 });
+                                  });
+                              }
+                              if (product.videoUrl) {
+                                  let vOrder = (product.videoOrder !== undefined && product.videoOrder !== null) ? product.videoOrder : 99;
+                                  allMedia.push({ type: 'video', url: product.videoUrl, order: vOrder });
+                              }
+                              allMedia.sort((a,b) => a.order - b.order);
+                            %>
+                            <% allMedia.forEach(media => { %>
+                                <% if (media.type === 'image') { %>
+                                    <div class="pdp-thumb media-thumb" onclick="changeMedia(this, '<%= mediaUrl(media.url, 'large') %>', 'image')">
+                                        <img src="<%= mediaUrl(media.url, 'thumb') %>" alt="">
+                                    </div>
+                                <% } else if (media.type === 'video') { %>
+                                    <div class="pdp-thumb media-thumb video-thumb" onclick="changeMedia(this, '<%= media.url %>', 'video')">
+                                        <div class="video-overlay"><i class="fas fa-play"></i></div>
+                                        <img src="<%= mediaUrl(product.imageUrl, 'thumb') %>" alt="Video" style="filter: brightness(0.6);">
+                                    </div>
+                                <% } %>
+                            <% }); %>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RIGHT COLUMN: PRODUCT INFO -->
+                <div class="col-lg-5">
+                    <div class="pdp-info-col">
+                        <span class="pdp-sku">SKU: <%= product._id.toString().substring(0,8).toUpperCase() %></span>
+                        <h1 class="pdp-title"><%= product.name %></h1>
+                        
+                        <div class="pdp-price-area">
+                            <span class="pdp-current-price" id="pdp-price" data-base="<%= product.price %>">₺ <%= product.price.toLocaleString('tr-TR') %></span>
+                            <% if (product.price > 1000) { %>
+                                <span class="pdp-old-price">₺ <%= Math.round(product.price * 1.2).toLocaleString('tr-TR') %></span>
+                            <% } %>
+
+                        </div>
+
+                        <div class="pdp-description" style="font-size: 14px; color: var(--premium-gray); line-height: 1.6; margin-bottom: 30px;">
+                            <%= product.description %>
+                        </div>
+
+                        <!-- DİNAMİK METAL RENKLERİ -->
+                        <% if (product.metalColor) { %>
+                        <div class="variation-group">
+                            <div class="variation-label">Altın Rengi <span id="color-label"><%= product.metalColor %></span></div>
+                            <div class="swatch-list">
+                                <% if (product.metalColor === 'Beyaz Altın') { %>
+                                    <div class="swatch-color swatch-white-gold active" onclick="selectVariation(this, 'color', 'Beyaz Altın')" title="Beyaz Altın"></div>
+                                <% } else if (product.metalColor === 'Sarı Altın') { %>
+                                    <div class="swatch-color swatch-yellow-gold active" onclick="selectVariation(this, 'color', 'Sarı Altın')" title="Sarı Altın"></div>
+                                <% } else if (product.metalColor === 'Rose Gold' || product.metalColor === 'Rose Altın') { %>
+                                    <div class="swatch-color swatch-rose-gold active" onclick="selectVariation(this, 'color', 'Rose Gold')" title="Rose Gold"></div>
+                                <% } else { %>
+                                    <span class="badge badge-light" style="padding: 6px 12px; font-weight: bold; background: #f0f0f0; border-radius: 4px;"><%= product.metalColor %></span>
+                                <% } %>
+                            </div>
+                        </div>
+                        <% } %>
+
+                        <% if (product.caratOptions && product.caratOptions.length > 0) { %>
+                        <div class="variation-group">
+                            <div class="variation-label">Karat Büyüklüğü <small class="text-muted">(Seçim İsteğe Bağlıdır)</small> <span id="carat-label">Seçilmedi</span></div>
+                            <div class="pill-list">
+                                <% product.caratOptions.forEach(opt => { %>
+                                    <div class="pill-item" onclick="selectCaratOption(this, '<%= opt.carat %>', '<%= opt.price %>')"><%= opt.carat %> ct</div>
+                                <% }); %>
+                                <div class="pill-item active" id="pill-default-carat" onclick="selectCaratOption(this, '', '<%= product.price %>')">Seçimi Kaldır</div>
+                            </div>
+                        </div>
+                        <% } %>
+                        <input type="hidden" id="selected-carat-input" value="">
+
+                        <div class="variation-group">
+                            <div class="variation-label" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                                <span>Yüzük Ölçüsü <span>Ölçünüzü Seçin</span></span>
+                                <a href="javascript:void(0)" onclick="openRingSizeModal()" style="font-size:12px; color: #c49b45; font-weight:600; text-decoration:underline;"><i class="fas fa-question-circle"></i> Ölçümü Nasıl Bulurum?</a>
+                            </div>
+                            <select class="premium-select" id="selected-size-select">
+                                <option value="">Seçiniz</option>
+                                <option value="7">7</option>
+                                <option value="8">8</option>
+                                <option value="9">9</option>
+                                <option value="10">10</option>
+                                <option value="11">11</option>
+                                <option value="12">12</option>
+                                <option value="13">13</option>
+                                <option value="14">14</option>
+                                <option value="15">15</option>
+                                <option value="16">16</option>
+                                <option value="17">17</option>
+                                <option value="18">18</option>
+                                <option value="19">19</option>
+                                <option value="20">20</option>
+                                <option value="21">21</option>
+                                <option value="22">22</option>
+                                <option value="23">23</option>
+                                <option value="24">24</option>
+                                <option value="25">25</option>
+                                <option value="26">26</option>
+                                <option value="27">27</option>
+                                <option value="28">28</option>
+                                <option value="29">29</option>
+                                <option value="30">30</option>
+                            </select>
+
+                        </div>
+
+                        <!-- ACTIONS -->
+                        <div class="pdp-actions" style="display: flex; align-items: center; gap: 15px;">
+                            <button class="btn-premium-secondary" onclick="handleCartAction('<%= product._id %>', false)">Sepete Ekle</button>
+                            <button class="btn-premium-primary" onclick="handleCartAction('<%= product._id %>', true)">Hemen Satın Al</button>
+                            <button class="fav-btn fav-btn-pdp" data-id="<%= product._id %>" style="width: 50px; height: 50px; border-radius: 50%; border: 2px solid #1a1a1a; background: #fff; color: #1a1a1a; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; cursor: pointer; transition: all 0.3s; flex-shrink: 0; padding: 0; outline: none;">
+                                <i class="<%= (typeof userFavorites !== 'undefined' && userFavorites.includes(product._id.toString())) ? 'fas fa-heart text-danger' : 'far fa-heart' %>"></i>
+                            </button>
+                        </div>
+
+                        <!-- ÜRÜN ÖZELLİKLERİ TABLOSU (sadece dolu alanlar) -->
+                        <%
+                            const specs = [];
+                            if (product.productCode) specs.push(['Ürün Kodu', product.productCode]);
+                            if (product.metal) specs.push(['Maden', product.metal]);
+                            if (product.metalColor) specs.push(['Maden Rengi', product.metalColor]);
+                            if (product.gemType) specs.push(['Değerli Taş', product.gemType]);
+                            if (product.caratWeight != null) specs.push(['Karat Ağırlığı', product.caratWeight + ' ct']);
+                            if (product.gemColor) specs.push(['Taş Rengi', product.gemColor]);
+                            if (product.gemClarity) specs.push(['Berraklık', product.gemClarity]);
+                            if (product.gemCut) specs.push(['Kesim / Şekil', product.gemCut]);
+                            if (product.certificate) specs.push(['Sertifika', product.certificate]);
+                        %>
+                        <% if (specs.length > 0) { %>
+                        <div class="pdp-specs-box" style="margin-top:30px; background:#f9f8f5; border-radius:14px; padding:20px 24px; border:1px solid #e8e0d0;">
+                            <h4 style="font-size:14px; font-weight:800; text-transform:uppercase; letter-spacing:2px; color:#1a1a1a; margin-bottom:16px;">Ürün Özellikleri</h4>
+                            <table style="width:100%; border-collapse:collapse;">
+                                <% specs.forEach(([label, value]) => { %>
+                                <tr style="border-bottom:1px solid #ede8df;">
+                                    <td style="padding:10px 0; font-size:13px; color:#888; width:50%; font-weight:600;"><%= label %></td>
+                                    <td style="padding:10px 0; font-size:13px; color:#1a1a1a; font-weight:700;"><%= value %></td>
+                                </tr>
+                                <% }); %>
+                            </table>
+                        </div>
+                        <% } %>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Product Details End -->
+
+    <!-- Yüzük Ölçüsü Bulma Modalı (1 TL Entegrasyonu) -->
+    <div id="ringSizeModal" class="ring-size-modal" style="display:none; position:fixed; z-index:1100; left:0; top:0; width:100%; height:100%; overflow:hidden; background-color:rgba(0,0,0,0.6); backdrop-filter: blur(8px); justify-content:center; align-items:center;">
+        <div class="ring-size-modal-content" style="background-color:#ffffff; margin:auto; padding:25px; border-radius:20px; width:90%; max-width:600px; box-shadow:0 20px 50px rgba(0,0,0,0.15); border:1px solid rgba(196,155,69,0.2); position:relative; animation: modalFadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1); min-height: 520px; max-height: 95vh; overflow-y: auto; display: flex; flex-direction: column; justify-content: space-between;">
+            <span class="ring-size-close" onclick="closeRingSizeModal()" style="color:#aaa; position:absolute; right:20px; top:15px; font-size:28px; font-weight:bold; cursor:pointer; transition:color 0.2s; z-index: 10;">&times;</span>
+            
+            <!-- Step Indicator -->
+            <div class="modal-wizard-steps" style="display: flex; justify-content: space-between; margin-bottom: 20px; position: relative; z-index: 2;">
+                <div class="modal-step-item active" id="mstep-dot-1" style="flex: 1; text-align: center; font-size: 11px; font-weight: 700; color: #c5a059;">
+                    <div class="modal-step-num" style="width: 28px; height: 28px; border-radius: 50%; background: #c5a059; color: #fff; display: flex; align-items: center; justify-content: center; margin: 0 auto 6px; font-weight: bold; font-size: 11px;">1</div>
+                    Giriş
+                </div>
+                <div class="modal-step-item" id="mstep-dot-2" style="flex: 1; text-align: center; font-size: 11px; font-weight: 500; color: #aaa;">
+                    <div class="modal-step-num" style="width: 28px; height: 28px; border-radius: 50%; background: #eee; color: #888; display: flex; align-items: center; justify-content: center; margin: 0 auto 6px; font-weight: bold; font-size: 11px;">2</div>
+                    Kalibrasyon
+                </div>
+                <div class="modal-step-item" id="mstep-dot-3" style="flex: 1; text-align: center; font-size: 11px; font-weight: 500; color: #aaa;">
+                    <div class="modal-step-num" style="width: 28px; height: 28px; border-radius: 50%; background: #eee; color: #888; display: flex; align-items: center; justify-content: center; margin: 0 auto 6px; font-weight: bold; font-size: 11px;">3</div>
+                    Ölçüm
+                </div>
+            </div>
+
+            <!-- Step Content 1: Welcome -->
+            <div id="mstep-content-1" class="mstep-content" style="text-align: center; margin-bottom: 10px;">
+                <div style="margin-bottom: 15px;">
+                    <img src="/assets/img/logo/custom_logo_v2.png" alt="Logo" style="max-height: 45px; object-fit: contain;">
+                </div>
+                <h3 style="font-size: 18px; font-weight: 700; color: #140C40; margin-bottom: 10px; font-family: 'Montserrat', sans-serif;">Ölçünüzü Bulmak Çok Kolay!</h3>
+                <p style="font-size: 13px; color: #666; line-height: 1.6; margin-bottom: 20px; max-width: 450px; margin-left: auto; margin-right: auto;">
+                    Yüzük ölçünüzü tam olarak tespit etmek için elinizde **fiziksel bir 1 TL madeni para** olması yeterlidir. Ekranınızı 1 TL ile kalibre ederek yüzüklerinizin iç çapını milimetrik hassasiyetle ölçeceğiz.
+                </p>
+                <div style="background: #fdfaf4; border-radius: 12px; padding: 12px; border: 1px solid #f6ecdb; max-width: 420px; margin: 0 auto 20px; text-align: left; font-size: 12px; color: #8c7340; line-height: 1.4;">
+                    <i class="fas fa-info-circle" style="margin-right: 6px; font-size: 14px; vertical-align: middle;"></i> <strong>Nasıl Çalışır?</strong> Her ekranın piksel yoğunluğu farklıdır. 1 TL madeni paranın sabit olan <strong>26.15 mm</strong> çapını ekranda eşleyerek cihazınızın piksel ölçeğini tanımlarız.
+                </div>
+                <button type="button" class="btn-premium-primary" onclick="goToModalStep(2)" style="max-width: 220px; margin: 0 auto; display: block; border-radius: 30px; padding: 12px 20px; font-size: 12px;">Hemen Başla</button>
+            </div>
+
+            <!-- Step Content 2: Calibration -->
+            <div id="mstep-content-2" class="mstep-content" style="display: none; text-align: center;">
+                <h3 style="font-size: 16px; font-weight: 700; color: #140C40; margin-bottom: 8px; font-family: 'Montserrat', sans-serif;">Ekran Kalibrasyonu</h3>
+                <p style="font-size: 12px; color: #666; line-height: 1.4; margin-bottom: 20px; max-width: 450px; margin-left: auto; margin-right: auto;">
+                    Ekranın üzerine fiziksel bir **1 TL** yerleştirin. Aşağıdaki kaydırıcıyı kullanarak ekrandaki daireyi **1 TL madeni para ile birebir aynı boyuta** getirin.
+                </p>
+
+                <!-- Calibration Interactive Area -->
+                <div style="height: 150px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; position: relative;">
+                    <div id="mcalibration-circle" style="width: 200px; height: 200px; border-radius: 50%; background: radial-gradient(circle, rgba(197, 160, 89, 0.15) 0%, rgba(197, 160, 89, 0.45) 100%); border: 3px dashed #c5a059; transition: width 0.05s ease, height 0.05s ease; box-shadow: 0 10px 25px rgba(197,160,89,0.15); display: flex; align-items: center; justify-content: center;">
+                        <div style="font-size: 10px; font-weight: 700; color: #8c7340; text-shadow: 0 1px 1px #fff; text-transform: uppercase; letter-spacing: 0.5px;">1 TL Koyun</div>
+                    </div>
+                </div>
+
+                <!-- Slider & Fine Tuning Buttons -->
+                <div style="max-width: 380px; margin: 0 auto 20px;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 8px;">
+                        <button type="button" class="btn-tune" onclick="tuneModalCalibration(-1)" style="width:32px; height:32px; border-radius:50%; border:1px solid #ccc; background:#fff; font-size:16px; font-weight:bold; color:#555; cursor:pointer; outline:none; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 4px rgba(0,0,0,0.05);">-</button>
+                        <input type="range" id="mcalibration-slider" min="150" max="300" value="200" oninput="resizeModalCalibrationCircle(this.value)" style="flex:1; height:6px; border-radius:5px; background:#e4cc95; outline:none; -webkit-appearance:none; cursor:pointer;">
+                        <button type="button" class="btn-tune" onclick="tuneModalCalibration(1)" style="width:32px; height:32px; border-radius:50%; border:1px solid #ccc; background:#fff; font-size:16px; font-weight:bold; color:#555; cursor:pointer; outline:none; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 4px rgba(0,0,0,0.05);">+</button>
+                    </div>
+                    <span id="mcal-pixels-label" style="font-size: 11px; color: #999; font-family: monospace;">Genişlik: 200px</span>
+                </div>
+
+                <div style="display: flex; gap: 10px; max-width: 360px; margin: 0 auto;">
+                    <button type="button" class="btn-premium-secondary" onclick="goToModalStep(1)" style="border-radius:30px; padding: 10px 20px; font-size: 12px; height: auto;">Geri Git</button>
+                    <button type="button" class="btn-premium-primary" onclick="saveModalCalibrationAndContinue()" style="border-radius:30px; padding: 10px 20px; font-size: 12px; height: auto;">Kalibrasyonu Tamamla</button>
+                </div>
+            </div>
+
+            <!-- Step Content 3: Measurement -->
+            <div id="mstep-content-3" class="mstep-content" style="display: none; text-align: center;">
+                <h3 style="font-size: 16px; font-weight: 700; color: #140C40; margin-bottom: 10px; font-family: 'Montserrat', sans-serif;">Yüzük Ölçümü Yapın</h3>
+                
+                <!-- Measurement Mode Tabs -->
+                <div style="display: flex; justify-content: center; gap: 8px; margin-bottom: 20px;">
+                    <button type="button" id="mtab-btn-ring" class="measure-tab-btn active" onclick="switchModalMeasureMode('ring')" style="padding:6px 14px; font-size:11px; font-weight:700; border-radius:20px; border:1px solid #c5a059; background:#c5a059; color:#fff; cursor:pointer; outline:none; transition: all 0.3s;">Mevcut Yüzük ile Ölç</button>
+                    <button type="button" id="mtab-btn-circles" class="measure-tab-btn" onclick="switchModalMeasureMode('circles')" style="padding:6px 14px; font-size:11px; font-weight:700; border-radius:20px; border:1px solid #ccc; background:#fff; color:#555; cursor:pointer; outline:none; transition: all 0.3s;">Ölçü Seçip Karşılaştır</button>
+                </div>
+
+                <!-- Mode A: Measure Existing Ring -->
+                <div id="mmode-content-ring" style="display: block;">
+                    <p style="font-size: 12px; color: #666; line-height: 1.4; margin-bottom: 15px; max-width: 450px; margin-left: auto; margin-right: auto;">
+                        Yüzüğünüzü dairenin üzerine koyun. Daireyi yüzüğünüzün **iç metal kenarlarıyla** birebir hizalayın.
+                    </p>
+
+                    <!-- Ring Interactive Circle Area -->
+                    <div style="height: 150px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; position: relative;">
+                        <div id="mring-measure-circle" style="width: 140px; height: 140px; border-radius: 50%; border: 2.5px solid #140C40; background: transparent; transition: width 0.05s ease, height 0.05s ease; box-shadow: 0 0 12px rgba(20, 12, 64, 0.12); display: flex; align-items: center; justify-content: center;">
+                            <div style="width: 100%; height: 100%; border-radius: 50%; border: 1px dashed #c5a059; opacity: 0.8;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Result Display Box -->
+                    <div style="background: #fcf9f2; border: 1px solid #e4cc95; border-radius: 12px; padding: 10px 15px; max-width: 350px; margin: 0 auto 15px; display: flex; align-items: center; justify-content: space-between;">
+                        <div style="text-align: left;">
+                            <span style="font-size: 10px; color: #888; text-transform: uppercase; font-weight: bold;">Tahmini Ölçünüz</span>
+                            <h4 style="font-size: 22px; font-weight: 800; color: #c5a059; margin: 0;" id="mring-size-result-label">15</h4>
+                        </div>
+                        <div style="text-align: right; border-left: 1px solid #ede8df; padding-left: 15px;">
+                            <span style="font-size: 10px; color: #888; display: block; font-weight: 600;">İç Çap</span>
+                            <span style="font-size: 13px; font-weight: 700; color: #140C40;" id="mring-diameter-result-label">17.52 mm</span>
+                        </div>
+                    </div>
+
+                    <!-- Ring Slider & Fine Tuning Buttons -->
+                    <div style="max-width: 380px; margin: 0 auto 20px;">
+                        <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+                            <button type="button" class="btn-tune" onclick="tuneModalRingMeasure(-1)" style="width:32px; height:32px; border-radius:50%; border:1px solid #ccc; background:#fff; font-size:16px; font-weight:bold; color:#555; cursor:pointer; outline:none; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 4px rgba(0,0,0,0.05);">-</button>
+                            <input type="range" id="mring-measure-slider" min="100" max="220" value="140" oninput="resizeModalRingMeasureCircle(this.value)" style="flex:1; height:6px; border-radius:5px; background:#c5a059; outline:none; -webkit-appearance:none; cursor:pointer;">
+                            <button type="button" class="btn-tune" onclick="tuneModalRingMeasure(1)" style="width:32px; height:32px; border-radius:50%; border:1px solid #ccc; background:#fff; font-size:16px; font-weight:bold; color:#555; cursor:pointer; outline:none; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 4px rgba(0,0,0,0.05);">+</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mode B: Choose Size and Display -->
+                <div id="mmode-content-circles" style="display: none;">
+                    <p style="font-size: 12px; color: #666; line-height: 1.4; margin-bottom: 20px; max-width: 450px; margin-left: auto; margin-right: auto;">
+                        Öğrenmek istediğiniz **yüzük ölçüsünü** seçin. Ekranda tam olarak o ölçünün birebir fiziksel boyutundaki daire çizilecektir.
+                    </p>
+
+                    <!-- Selection Dropdown -->
+                    <div style="max-width: 260px; margin: 0 auto 20px;">
+                        <select id="msize-comparator-select" onchange="updateModalComparatorSize(this.value)" style="width: 100%; padding: 10px; border: 1px solid #c5a059; border-radius: 8px; font-size: 13px; font-weight: 700; color: #140C40; outline: none; background: #fff; cursor: pointer;">
+                            <!-- Will be populated dynamically -->
+                        </select>
+                    </div>
+
+                    <!-- Comparison Circle Area -->
+                    <div style="height: 140px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; position: relative;">
+                        <div id="mring-compare-circle" style="width: 140px; height: 140px; border-radius: 50%; border: 3px solid #c5a059; background: radial-gradient(circle, rgba(197,160,89,0.05) 0%, rgba(197,160,89,0.15) 100%); display: flex; align-items: center; justify-content: center; transition: width 0.15s ease, height 0.15s ease;">
+                            <div style="font-size: 16px; font-weight: 800; color: #140C40;" id="mring-compare-label">15</div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-bottom: 15px;">
+                        <span style="font-size: 12px; color: #888; font-weight: 600;">Seçilen Ölçü İç Çapı: <strong style="color:#140C40;" id="mring-compare-diameter-label">17.52 mm</strong></span>
+                    </div>
+                </div>
+
+                <!-- Premium Bilgilendirme ve Uyarı Kutusu -->
+                <div style="background: #fafaf9; border: 1px solid #e5dfd5; border-radius: 14px; padding: 16px; margin: 15px auto; max-width: 480px; text-align: left; box-shadow: 0 4px 15px rgba(0,0,0,0.02); display: flex; align-items: flex-start; gap: 14px;">
+                    <img src="/assets/img/logo/custom_logo_v2.png" alt="MI DIAMOND" style="max-height: 28px; max-width: 55px; object-fit: contain; flex-shrink: 0; margin-top: 2px;">
+                    <div style="font-size: 11px; line-height: 1.6; color: #555; font-family: 'Inter', sans-serif;">
+                        <strong>Önemli Bilgilendirme:</strong> Kalibrasyonu doğru yapıp uygun ölçüyü seçtiğinizde, sistem %95 doğrulukla yüzük ölçünüzü hesaplar.<br><br>
+                        Emin değilseniz, <strong>"Yeniden Kalibre Et"</strong> butonuna basarak yeniden kalibrasyon yapabilirsiniz.<br><br>
+                        Ölçüm yöntemi sistemde görüntülenemediğinden, olası hatalardan <strong>MI DIAMOND</strong> sorumlu değildir.
+                    </div>
+                </div>
+
+                <!-- Footer actions -->
+                <div style="display: flex; gap: 10px; max-width: 360px; margin: 0 auto;">
+                    <button type="button" class="btn-premium-secondary" onclick="goToModalStep(2)" style="border-radius:30px; padding: 10px 20px; font-size: 12px; height: auto;">Yeniden Kalibre Et</button>
+                    <button type="button" class="btn-premium-primary" onclick="applyRingSizeToProduct()" style="border-radius:30px; padding: 10px 20px; font-size: 12px; height: auto;">Ölçüyü Uygula</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <style>
+    @keyframes modalFadeIn {
+        from { opacity: 0; transform: translateY(-30px) scale(0.95); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .ring-size-close:hover {
+        color: #c5a059 !important;
+    }
+    .measure-tab-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+    }
+    .btn-tune {
+        transition: all 0.2s ease;
+        user-select: none;
+    }
+    .btn-tune:active {
+        transform: scale(0.9);
+        background-color: #f0f0f0 !important;
+    }
+    
+    /* Fix nice-select layout inside the ring sizer modal */
+    .ring-size-modal-content .nice-select {
+        float: none !important;
+        display: inline-flex !important;
+        align-items: center;
+        width: 100% !important;
+        max-width: 260px !important;
+        margin: 0 auto 20px !important;
+        height: 44px !important;
+        line-height: 42px !important;
+        border: 1px solid #c5a059 !important;
+        border-radius: 8px !important;
+        font-size: 13px !important;
+        font-weight: 700 !important;
+        color: #140C40 !important;
+        box-shadow: 0 4px 10px rgba(197, 155, 69, 0.05) !important;
+        background-color: #fff !important;
+        padding-left: 14px !important;
+        padding-right: 25px !important;
+        text-align: left !important;
+    }
+
+    .ring-size-modal-content .nice-select::after {
+        right: 14px !important;
+    }
+
+    .ring-size-modal-content .nice-select .list {
+        width: 100% !important;
+        max-height: 180px !important;
+        overflow-y: auto !important;
+    }
+
+    /* Ensure comparison circle wraps correctly below the dropdown */
+    .ring-size-modal-content #mring-compare-circle {
+        clear: both !important;
+        margin: 0 auto 20px !important;
+    }
+    </style>
+</main>
+
+
+<script>
+// Jewelery Ring Size Chart Data ( Turkish standard sizing table)
+const ringSizeChart = [
+    { size: 7, diameter: 14.96 },
+    { size: 8, diameter: 15.28 },
+    { size: 9, diameter: 15.61 },
+    { size: 10, diameter: 15.92 },
+    { size: 11, diameter: 16.24 },
+    { size: 12, diameter: 16.56 },
+    { size: 13, diameter: 16.88 },
+    { size: 14, diameter: 17.20 },
+    { size: 15, diameter: 17.52 },
+    { size: 16, diameter: 17.83 },
+    { size: 17, diameter: 18.15 },
+    { size: 18, diameter: 18.47 },
+    { size: 19, diameter: 18.79 },
+    { size: 20, diameter: 19.11 },
+    { size: 21, diameter: 19.43 },
+    { size: 22, diameter: 19.75 },
+    { size: 23, diameter: 20.06 },
+    { size: 24, diameter: 20.38 },
+    { size: 25, diameter: 20.70 },
+    { size: 26, diameter: 21.02 },
+    { size: 27, diameter: 21.34 },
+    { size: 28, diameter: 21.66 },
+    { size: 29, diameter: 21.97 },
+    { size: 30, diameter: 22.29 }
+];
+
+const oneTLCoinDiameterMm = 26.15;
+let mcurrentStep = 1;
+let mpxPerMm = 7.6481; // Default fallback scale for modal
+let mcalibrationCirclePixels = 200;
+
+function openRingSizeModal() {
+    const modal = document.getElementById('ringSizeModal');
+    modal.style.display = "flex";
+    document.body.style.overflow = "hidden"; // Prevent scrolling behind
+    
+    // Initialize Modal wizard options
+    goToModalStep(1);
+    
+    // Populate select element dynamically if empty
+    const selectEl = document.getElementById('msize-comparator-select');
+    if (selectEl && selectEl.children.length === 0) {
+        ringSizeChart.forEach(item => {
+            const option = document.createElement('option');
+            option.value = item.size;
+            option.text = `Ölçü ${item.size} (${item.diameter.toFixed(2)} mm)`;
+            if (item.size === 15) option.selected = true;
+            selectEl.appendChild(option);
+        });
+        
+        // Force jQuery niceSelect to rebuild with the new options
+        if (typeof $(selectEl).niceSelect === 'function') {
+            $(selectEl).niceSelect('update');
+        }
+    }
+}
+
+function closeRingSizeModal() {
+    const modal = document.getElementById('ringSizeModal');
+    modal.style.display = "none";
+    document.body.style.overflow = ""; // Enable scrolling
+}
+
+// Close when clicking outside content
+window.addEventListener('click', function(event) {
+    const modal = document.getElementById('ringSizeModal');
+    if (event.target === modal) {
+        closeRingSizeModal();
+    }
+});
+
+function goToModalStep(step) {
+    document.querySelectorAll('.mstep-content').forEach(el => el.style.display = 'none');
+    document.getElementById(`mstep-content-${step}`).style.display = 'block';
+    
+    document.querySelectorAll('.modal-step-item').forEach((el, index) => {
+        const dotNum = index + 1;
+        const stepNumCircle = el.querySelector('.modal-step-num');
+        
+        if (dotNum < step) {
+            el.className = 'modal-step-item active';
+            el.style.color = '#c5a059';
+            if (stepNumCircle) {
+                stepNumCircle.style.background = '#28a745';
+                stepNumCircle.style.color = '#fff';
+                stepNumCircle.innerHTML = '<i class="fas fa-check"></i>';
+            }
+        } else if (dotNum === step) {
+            el.className = 'modal-step-item active';
+            el.style.color = '#c5a059';
+            if (stepNumCircle) {
+                stepNumCircle.style.background = '#c5a059';
+                stepNumCircle.style.color = '#fff';
+                stepNumCircle.innerHTML = dotNum;
+            }
+        } else {
+            el.className = 'modal-step-item';
+            el.style.color = '#aaa';
+            if (stepNumCircle) {
+                stepNumCircle.style.background = '#eee';
+                stepNumCircle.style.color = '#888';
+                stepNumCircle.innerHTML = dotNum;
+            }
+        }
+    });
+
+    mcurrentStep = step;
+    
+    if (step === 3) {
+        calculateModalRingSize(document.getElementById('mring-measure-slider').value);
+        updateModalComparatorSize(document.getElementById('msize-comparator-select').value);
+    }
+}
+
+// --- Step 2 Calibration Functions ---
+function resizeModalCalibrationCircle(px) {
+    mcalibrationCirclePixels = parseInt(px);
+    const circle = document.getElementById('mcalibration-circle');
+    circle.style.width = px + 'px';
+    circle.style.height = px + 'px';
+    document.getElementById('mcal-pixels-label').innerText = `Genişlik: ${px}px`;
+}
+
+function tuneModalCalibration(change) {
+    const slider = document.getElementById('mcalibration-slider');
+    let newVal = parseInt(slider.value) + change;
+    if (newVal >= parseInt(slider.min) && newVal <= parseInt(slider.max)) {
+        slider.value = newVal;
+        resizeModalCalibrationCircle(newVal);
+    }
+}
+
+function saveModalCalibrationAndContinue() {
+    mpxPerMm = mcalibrationCirclePixels / oneTLCoinDiameterMm;
+    goToModalStep(3);
+}
+
+// --- Step 3 Measurement Functions ---
+function switchModalMeasureMode(mode) {
+    document.querySelectorAll('#ringSizeModal .measure-tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+        btn.style.background = '#fff';
+        btn.style.color = '#555';
+        btn.style.borderColor = '#ccc';
+    });
+    
+    const activeBtn = document.getElementById(`mtab-btn-${mode}`);
+    if (activeBtn) {
+        activeBtn.classList.add('active');
+        activeBtn.style.background = '#c5a059';
+        activeBtn.style.color = '#fff';
+        activeBtn.style.borderColor = '#c5a059';
+    }
+
+    document.getElementById('mmode-content-ring').style.display = (mode === 'ring' ? 'block' : 'none');
+    document.getElementById('mmode-content-circles').style.display = (mode === 'circles' ? 'block' : 'none');
+}
+
+function resizeModalRingMeasureCircle(px) {
+    const circle = document.getElementById('mring-measure-circle');
+    circle.style.width = px + 'px';
+    circle.style.height = px + 'px';
+    calculateModalRingSize(px);
+}
+
+function tuneModalRingMeasure(change) {
+    const slider = document.getElementById('mring-measure-slider');
+    let newVal = parseInt(slider.value) + change;
+    if (newVal >= parseInt(slider.min) && newVal <= parseInt(slider.max)) {
+        slider.value = newVal;
+        resizeModalRingMeasureCircle(newVal);
+    }
+}
+
+let lastMatchedRingSize = 15;
+
+function calculateModalRingSize(px) {
+    const physicalDiameterMm = px / mpxPerMm;
+    document.getElementById('mring-diameter-result-label').innerText = physicalDiameterMm.toFixed(2) + ' mm';
+    
+    let closestMatch = ringSizeChart[0];
+    let minDifference = Math.abs(physicalDiameterMm - closestMatch.diameter);
+    
+    for (let i = 1; i < ringSizeChart.length; i++) {
+        let diff = Math.abs(physicalDiameterMm - ringSizeChart[i].diameter);
+        if (diff < minDifference) {
+            minDifference = diff;
+            closestMatch = ringSizeChart[i];
+        }
+    }
+    
+    document.getElementById('mring-size-result-label').innerText = closestMatch.size;
+    lastMatchedRingSize = closestMatch.size;
+}
+
+function updateModalComparatorSize(size) {
+    const sizeNum = parseInt(size);
+    const item = ringSizeChart.find(o => o.size === sizeNum);
+    if (!item) return;
+    
+    const pxWidth = item.diameter * mpxPerMm;
+    const circle = document.getElementById('mring-compare-circle');
+    circle.style.width = pxWidth + 'px';
+    circle.style.height = pxWidth + 'px';
+    
+    document.getElementById('mring-compare-label').innerText = item.size;
+    document.getElementById('mring-compare-diameter-label').innerText = item.diameter.toFixed(2) + ' mm';
+    lastMatchedRingSize = item.size;
+}
+
+function applyRingSizeToProduct() {
+    const sizeSelect = document.getElementById('selected-size-select');
+    if (sizeSelect) {
+        sizeSelect.value = lastMatchedRingSize;
+        if (typeof $(sizeSelect).niceSelect === 'function') {
+            $(sizeSelect).niceSelect('update');
+        }
+    }
+    closeRingSizeModal();
+}
+
+function updateQty(change) {
+    const input = document.getElementById('qty-input');
+    if (!input) return;
+    let val = parseInt(input.value) + change;
+    if (val < 1) val = 1;
+    if (val > 10) val = 10;
+    input.value = val;
+}
+
+async function handleCartAction(productId, isBuyNow) {
+    const qtyInput = document.getElementById('qty-input');
+    const quantity = qtyInput ? parseInt(qtyInput.value) || 1 : 1;
+    const selectedCarat = document.getElementById('selected-carat-input').value;
+    const sizeSelect = document.getElementById('selected-size-select');
+    const selectedSize = sizeSelect ? sizeSelect.value : '';
+    
+    // UI Feedback
+    const btnCart = document.querySelector('.btn-premium-secondary');
+    const btnBuy = document.querySelector('.btn-premium-primary');
+    
+    if (isBuyNow && btnBuy) {
+        btnBuy.innerHTML = '<i class="fas fa-spinner fa-spin"></i> İşleniyor...';
+    } else if (!isBuyNow && btnCart) {
+        btnCart.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Ekleniyor...';
+    }
+
+    try {
+        const response = await fetch('/cart/add', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                productId: productId,
+                quantity: quantity,
+                selectedCarat: selectedCarat || undefined,
+                selectedSize: selectedSize || undefined
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            if (isBuyNow) {
+                window.location.href = '/checkout';
+            } else {
+                alert('Ürün sepete başarıyla eklendi!');
+                window.location.reload(); 
+            }
+        } else {
+            alert('Hata: ' + data.message);
+            resetButtons(btnCart, btnBuy);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Bir hata oluştu, lütfen tekrar deneyin.');
+        resetButtons(btnCart, btnBuy);
+    }
+}
+
+function resetButtons(btnCart, btnBuy) {
+    if (btnCart) btnCart.innerHTML = 'Sepete Ekle';
+    if (btnBuy) btnBuy.innerHTML = 'Hemen Satın Al';
+}
+
+function selectCaratOption(element, carat, price) {
+    // Aktif class'ları güncelle
+    element.parentElement.querySelectorAll('.pill-item').forEach(el => el.classList.remove('active'));
+    element.classList.add('active');
+    
+    // Label ve input'u güncelle
+    const caratLabel = document.getElementById('carat-label');
+    const inputVal = document.getElementById('selected-carat-input');
+    const priceEl = document.getElementById('pdp-price');
+    const oldPriceEl = document.querySelector('.pdp-old-price');
+    
+    if (carat) {
+        caratLabel.innerText = carat + ' ct';
+        inputVal.value = carat;
+    } else {
+        caratLabel.innerText = 'Seçilmedi';
+        inputVal.value = '';
+    }
+
+    // Fiyatı güncelle
+    const parsedPrice = parseFloat(price);
+    const formattedPrice = parsedPrice.toLocaleString('tr-TR');
+    priceEl.innerText = '₺ ' + formattedPrice;
+
+    if (oldPriceEl) {
+        if (parsedPrice > 1000) {
+            oldPriceEl.style.display = 'inline';
+            oldPriceEl.innerText = '₺ ' + Math.round(parsedPrice * 1.2).toLocaleString('tr-TR');
+        } else {
+            oldPriceEl.style.display = 'none';
+        }
+    }
+}
+
+function selectVariation(element, type, value, priceMultiplier = null) {
+    element.parentElement.querySelectorAll(type === 'color' ? '.swatch-color' : '.pill-item').forEach(el => el.classList.remove('active'));
+    element.classList.add('active');
+    document.getElementById(type + '-label').innerText = value;
+    
+    if (priceMultiplier) {
+        const priceEl = document.getElementById('pdp-price');
+        const basePrice = parseFloat(priceEl.getAttribute('data-base'));
+        const newPrice = Math.round(basePrice * priceMultiplier);
+        priceEl.innerText = '₺ ' + newPrice.toLocaleString('tr-TR');
+    }
+}
+
+// Dynamic gallery items for Magnific Popup
+const productGalleryItems = [
+    { src: '<%= mediaUrl(product.imageUrl, 'large') %>' },
+    <% allMedia.forEach(media => { %>
+        <% if (media.type === 'image') { %>
+            { src: '<%= mediaUrl(media.url, 'large') %>' },
+        <% } %>
+    <% }); %>
+];
+
+let lastTap = 0;
+function handleImageTap(e, src) {
+    if (window.innerWidth >= 768) return; // Only for mobile
+    const currentTime = new Date().getTime();
+    const tapLength = currentTime - lastTap;
+    if (tapLength < 300 && tapLength > 0) {
+        e.preventDefault();
+        openLargePhoto(src);
+    }
+    lastTap = currentTime;
+}
+
+function openLargePhoto(src) {
+    if (window.innerWidth < 768) {
+        let index = productGalleryItems.findIndex(item => src.includes(item.src));
+        if (index === -1) index = 0;
+
+        $.magnificPopup.open({
+            items: productGalleryItems,
+            gallery: {
+                enabled: true,
+                tPrev: 'Önceki',
+                tNext: 'Sonraki',
+                tCounter: '%curr% / %total%'
+            },
+            type: 'image',
+            mainClass: 'mfp-fade',
+            removalDelay: 160,
+            preloader: false,
+            fixedContentPos: true
+        }, index);
+    }
+}
+
+function zoomImage(e) {
+    if (window.innerWidth < 768) return; // Don't zoom on mobile
+    const container = document.getElementById('main-image-container');
+    const img = document.getElementById('main-product-image');
+    if (img.style.display === 'none') return; // Don't zoom video
+    
+    const x = e.clientX - container.getBoundingClientRect().left;
+    const y = e.clientY - container.getBoundingClientRect().top;
+    
+    // Zoom strength is 2x
+    img.style.transformOrigin = `${x}px ${y}px`;
+    img.style.transform = 'scale(2)';
+}
+
+function resetZoom() {
+    if (window.innerWidth < 768) return; // Don't zoom on mobile
+    const img = document.getElementById('main-product-image');
+    img.style.transformOrigin = 'center center';
+    img.style.transform = 'scale(1)';
+}
+
+function changeMedia(element, src, type) {
+    const imgEl = document.getElementById('main-product-image');
+    const vidEl = document.getElementById('main-product-video');
+    
+    document.querySelectorAll('.pdp-thumb').forEach(t => t.classList.remove('active'));
+    element.classList.add('active');
+    
+    if (type === 'video') {
+        imgEl.style.display = 'none';
+        vidEl.style.display = 'block';
+        if (vidEl.src !== src) {
+            vidEl.src = src;
+        }
+        
+        // Ensure inline rendering properties are set programmatically for all mobile OS
+        vidEl.setAttribute('playsinline', '');
+        vidEl.setAttribute('webkit-playsinline', '');
+        
+        // Attempt to play the video with error catching for mobile gesture restrictions
+        const playPromise = vidEl.play();
+        if (playPromise !== undefined) {
+            playPromise.catch(error => {
+                console.log("Video auto-play was prevented by the mobile browser. User can trigger manually.", error);
+            });
+        }
+        resetZoom(); // Reset zoom if video active
+    } else {
+        vidEl.pause();
+        vidEl.style.display = 'none';
+        imgEl.style.display = 'block';
+        imgEl.src = src;
+    }
+}
+
+function prevImage() {
+    const thumbs = Array.from(document.querySelectorAll('.media-thumb'));
+    const activeIdx = thumbs.findIndex(t => t.classList.contains('active'));
+    if (activeIdx > 0) {
+        thumbs[activeIdx - 1].click();
+    } else {
+        thumbs[thumbs.length - 1].click(); // loop to end
+    }
+}
+
+function nextImage() {
+    const thumbs = Array.from(document.querySelectorAll('.media-thumb'));
+    const activeIdx = thumbs.findIndex(t => t.classList.contains('active'));
+    if (activeIdx < thumbs.length - 1) {
+        thumbs[activeIdx + 1].click();
+    } else {
+        thumbs[0].click(); // loop to start
+    }
+}
+
+</script>
+
+<%- include('partials/footer') %>

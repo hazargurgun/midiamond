@@ -1,0 +1,230 @@
+<%- include('../partials/head') %>
+<%- include('../partials/header') %>
+
+<main>
+    <div class="slider-area ">
+        <div class="single-slider slider-height2 d-flex align-items-center">
+            <div class="container">
+                <div class="row">
+                    <div class="col-xl-12">
+                        <div class="hero-cap text-center">
+                            <h2>Hesabım</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section class="checkout_area section_padding">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4">
+                    <div class="order_box">
+                        <h2>Kullanıcı Menüsü</h2>
+                        <ul class="list" style="margin-bottom: 20px;">
+                            <li><a href="#profile" data-toggle="tab" class="active" style="display:block; padding:10px 0; border-bottom:1px solid #eee; font-weight: bold; color: #ff3368;">Profil Bilgilerim</a></li>
+                            <li><a href="#orders" data-toggle="tab" style="display:block; padding:10px 0; border-bottom:1px solid #eee; color: #4a4a4a;">Siparişlerim</a></li>
+                            <li><a href="#favorites" data-toggle="tab" style="display:block; padding:10px 0; border-bottom:1px solid #eee; color: #4a4a4a;">Favorilerim</a></li>
+                            <li><a href="/auth/logout" style="display:block; padding:10px 0; color: #4a4a4a;">Çıkış Yap</a></li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="col-lg-8 tab-content">
+                    <% if (successMessage) { %>
+                        <div class="alert alert-success"><%= successMessage %></div>
+                    <% } %>
+                    <% if (errorMessage) { %>
+                        <div class="alert alert-danger"><%= errorMessage %></div>
+                    <% } %>
+
+                    <!-- Profil Tab -->
+                    <div class="tab-pane fade show active" id="profile">
+                        <div class="billing_details">
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <h3>Profil Bilgilerim</h3>
+                                    <form class="row contact_form" action="/user/profile/update" method="post" novalidate="novalidate">
+                                        <div class="col-md-6 form-group p_star">
+                                            <label>Ad Soyad</label>
+                                            <input type="text" class="form-control" id="name" name="name" value="<%= profileUser.name %>">
+                                        </div>
+                                        <div class="col-md-6 form-group p_star">
+                                            <label>Telefon</label>
+                                            <input type="text" class="form-control" id="phone" name="phone" value="<%= profileUser.phone || '' %>">
+                                        </div>
+                                        <div class="col-md-12 form-group p_star">
+                                            <label>E-posta (Değiştirilemez)</label>
+                                            <input type="email" class="form-control" value="<%= profileUser.email %>" readonly disabled>
+                                        </div>
+                                        <div class="col-md-12 form-group p_star">
+                                            <label>Adres</label>
+                                            <textarea class="form-control" name="address" id="address" rows="3"><%= profileUser.address || '' %></textarea>
+                                        </div>
+                                        <div class="col-md-12 form-group mt-3">
+                                            <button type="submit" value="submit" class="btn_3" style="background-color: #ff3368; color: #fff; border: none; padding: 12px 30px; cursor: pointer; text-transform: uppercase; font-weight: 500;">Bilgileri Güncelle</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Siparişler Tab -->
+                    <div class="tab-pane fade" id="orders" style="display: none;">
+                        <div class="billing_details">
+                            <h3>Geçmiş Siparişlerim</h3>
+                            <% if (orders && orders.length > 0) { %>
+                                <div class="table-responsive">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">Tarih</th>
+                                                <th scope="col">Tutar</th>
+                                                <th scope="col">Durum</th>
+                                                <th scope="col">Detay</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <% orders.forEach(order => { %>
+                                                <tr>
+                                                    <td>
+                                                        <p><%= new Date(order.createdAt).toLocaleDateString('tr-TR') %></p>
+                                                    </td>
+                                                    <td>
+                                                        <p>₺<%= order.totalAmount %></p>
+                                                    </td>
+                                                    <td>
+                                                        <span class="badge badge-info" style="font-size: 14px; padding: 5px 10px; background-color: #ff3368; color: white;"><%= order.orderStatus %></span>
+                                                    </td>
+                                                    <td>
+                                                        <ul style="list-style: none; padding: 0; margin: 0;">
+                                                            <% order.items.forEach(item => { %>
+                                                                <li style="font-size: 13px;">
+                                                                    <%= item.product ? item.product.name : 'Silinmiş Ürün' %> (x<%= item.quantity %>)
+                                                                    <% if (item.selectedCarat || item.selectedSize) { %>
+                                                                        <br>
+                                                                        <small class="text-muted" style="font-size: 11px;">
+                                                                            <%= item.selectedCarat ? item.selectedCarat + ' ct' : '' %>
+                                                                            <%= (item.selectedCarat && item.selectedSize) ? ' / ' : '' %>
+                                                                            <%= item.selectedSize ? 'Ölçü: ' + item.selectedSize : '' %>
+                                                                        </small>
+                                                                    <% } %>
+                                                                </li>
+                                                            <% }) %>
+                                                        </ul>
+                                                    </td>
+                                                </tr>
+                                            <% }) %>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            <% } else { %>
+                                <div class="alert alert-info">Henüz verilmiş bir siparişiniz bulunmamaktadır.</div>
+                                <a href="/shop" class="btn_3 mt-3">Alışverişe Başla</a>
+                            <% } %>
+                        </div>
+                    
+                    <!-- Favoriler Tab -->
+                    <div class="tab-pane fade" id="favorites" style="display: none;">
+                        <div class="billing_details">
+                            <h3>Favori Mücevherlerim</h3>
+                            <% if (profileUser.favorites && profileUser.favorites.length > 0) { %>
+                                <div class="premium-grid">
+                                    <% profileUser.favorites.forEach(product => { %>
+                                        <div class="premium-card wow fadeInUp" data-wow-duration="1s" data-wow-delay=".1s">
+                                            <div class="premium-card-img-wrapper">
+                                                <a href="/product/<%= product._id %>">
+                                                    <img src="<%= mediaUrl(product.imageUrl, 'thumb') %>" alt="<%= product.name %>" class="primary-img" loading="lazy">
+                                                    <% if (product.images && product.images[0] && product.images[0].url) { %>
+                                                    <img src="<%= mediaUrl(product.images[0].url, 'thumb') %>" alt="<%= product.name %>" class="secondary-img" loading="lazy">
+                                                    <% } %>
+                                                </a>
+                                                <button class="fav-btn" data-id="<%= product._id %>">
+                                                    <i class="fas fa-heart text-danger"></i>
+                                                </button>
+                                            </div>
+                                            <div class="premium-card-info">
+                                                <div class="premium-card-title">
+                                                    <a href="/product/<%= product._id %>"><%= product.name %></a>
+                                                </div>
+                                                <div class="premium-card-desc">
+                                                    <%= product.description ? product.description.substring(0,30) + '...' : 'Pırlanta Şıklığı' %>
+                                                </div>
+                                                <div class="premium-card-price-wrap">
+                                                    <span class="premium-card-price">₺ <%= product.price.toLocaleString('tr-TR') %></span>
+                                                </div>
+                                                <div class="card-actions">
+                                                    <a href="/product/<%= product._id %>" class="btn-premium-secondary" style="padding: 10px; font-size: 10px;">İncele</a>
+                                                    <button onclick="window.location.href='/product/<%= product._id %>'" class="btn-premium-primary" style="padding: 10px; font-size: 10px;">Sepete Ekle</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    <% }); %>
+                                </div>
+                            <% } else { %>
+                                <div class="text-center" style="padding: 40px 0;">
+                                    <div style="margin-bottom: 20px;">
+                                        <i class="far fa-heart" style="font-size: 48px; color: #c49b45; opacity: 0.5;"></i>
+                                    </div>
+                                    <h4 style="font-family: 'Outfit', sans-serif; font-weight: 300; color: #111; margin-bottom: 15px;">Henüz favori ürününüz bulunmamaktadır.</h4>
+                                    <p style="color: #666; font-size: 13px; margin-bottom: 20px;">Koleksiyonlarimizi incelemek için mağazamızı ziyaret edebilirsiniz.</p>
+                                    <a href="/shop" class="btn_3">Alışverişe Başla</a>
+                                </div>
+                            <% } %>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<script>
+// Simple Vanilla JS to handle tabs without relying on jQuery or external scripts
+document.addEventListener('DOMContentLoaded', function() {
+    const tabs = document.querySelectorAll('.order_box .list a[data-toggle="tab"]');
+    
+    tabs.forEach(tab => {
+        tab.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Reset styles for all tabs
+            tabs.forEach(t => { 
+                t.style.fontWeight = 'normal'; 
+                t.style.color = '#4a4a4a';
+            });
+            
+            // Apply active styles to clicked tab
+            this.style.fontWeight = 'bold';
+            this.style.color = '#ff3368';
+            
+            // Hide all panes
+            const panes = ['profile', 'orders', 'favorites'];
+            panes.forEach(paneId => {
+                const pane = document.getElementById(paneId);
+                if (pane) {
+                    pane.style.display = 'none';
+                    pane.classList.remove('show', 'active');
+                }
+            });
+            
+            // Show target pane
+            const targetId = this.getAttribute('href').substring(1);
+            const targetElement = document.getElementById(targetId);
+            if (targetElement) {
+                targetElement.style.display = 'block';
+                
+                // Small timeout to allow display:block to apply before adding opacity class
+                setTimeout(() => {
+                    targetElement.classList.add('show', 'active');
+                }, 10);
+            }
+        });
+    });
+});
+</script>
+
+<%- include('../partials/footer') %>
