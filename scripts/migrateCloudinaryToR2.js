@@ -79,7 +79,11 @@ function cloudinaryBasicAuth() {
 }
 
 async function fetchOk(url, headers = {}) {
-    const res = await fetch(url, { redirect: 'follow', headers });
+    const res = await fetch(url, {
+        redirect: 'follow',
+        headers,
+        signal: AbortSignal.timeout(90000)
+    });
     if (!res.ok) {
         const errText = await res.text().catch(() => '');
         throw new Error(`HTTP ${res.status} ${res.statusText}${errText ? ': ' + errText.slice(0, 180) : ''}`);
@@ -152,14 +156,20 @@ async function download(url) {
     throw new Error(errors.join(' | '));
 }
 
-async function migrateOne(url, folder) {
-    if (!shouldMigrate(url)) return { url, skipped: true };
+async function migrateOne(url, folder, label) {
+    if (!shouldMigrate(url)) {
+        console.log(`  atlandı: ${label}`);
+        return { url, skipped: true };
+    }
+    console.log(`  indiriliyor: ${label}`);
     const { buffer, contentType } = await download(url);
     if (isVideoUrl(url, contentType)) {
         const next = await uploadVideoBuffer(buffer, contentType, 'videos');
+        console.log(`  yüklendi (video): ${next}`);
         return { url: next, skipped: false };
     }
     const next = await uploadImageVariants(buffer, folder);
+    console.log(`  yüklendi (görsel): ${next}`);
     return { url: next, skipped: false };
 }
 
@@ -182,11 +192,15 @@ async function run() {
     let skipped = 0;
 
     const products = await Product.find();
-    for (const product of products) {
+    console.log(`Ürün sayısı: ${products.length}`);
+
+    for (let i = 0; i < products.length; i++) {
+        const product = products[i];
         let changed = false;
+        console.log(`[${i + 1}/${products.length}] ${product.name}`);
 
         try {
-            const main = await migrateOne(product.imageUrl, 'products');
+            const main = await migrateOne(product.imageUrl, 'products', 'imageUrl');
             if (!main.skipped) {
                 product.imageUrl = main.url;
                 changed = true;
@@ -195,13 +209,15 @@ async function run() {
                 skipped += 1;
             }
         } catch (err) {
+            console.log(`  HATA imageUrl: ${err.message}`);
             failed.push({ type: 'product.imageUrl', id: product._id.toString(), url: product.imageUrl, error: err.message });
         }
 
         if (Array.isArray(product.images) && product.images.length) {
-            for (const img of product.images) {
+            for (let j = 0; j < product.images.length; j++) {
+                const img = product.images[j];
                 try {
-                    const result = await migrateOne(img.url, 'products');
+                    const result = await migrateOne(img.url, 'products', `images[${j}]`);
                     if (!result.skipped) {
                         img.url = result.url;
                         changed = true;
@@ -210,6 +226,7 @@ async function run() {
                         skipped += 1;
                     }
                 } catch (err) {
+                    console.log(`  HATA images[${j}]: ${err.message}`);
                     failed.push({ type: 'product.images', id: product._id.toString(), url: img.url, error: err.message });
                 }
             }
@@ -217,7 +234,7 @@ async function run() {
 
         if (product.videoUrl) {
             try {
-                const result = await migrateOne(product.videoUrl, 'videos');
+                const result = await migrateOne(product.videoUrl, 'videos', 'videoUrl');
                 if (!result.skipped) {
                     product.videoUrl = result.url;
                     changed = true;
@@ -226,21 +243,23 @@ async function run() {
                     skipped += 1;
                 }
             } catch (err) {
+                console.log(`  HATA videoUrl: ${err.message}`);
                 failed.push({ type: 'product.videoUrl', id: product._id.toString(), url: product.videoUrl, error: err.message });
             }
         }
 
         if (changed) {
             await product.save();
-            console.log('Ürün güncellendi:', product.name);
+            console.log('  kayıt edildi.');
         }
     }
 
     const banners = await Banner.find();
+    console.log(`Banner sayısı: ${banners.length}`);
     for (const banner of banners) {
         let changed = false;
         try {
-            const main = await migrateOne(banner.imageUrl, 'banners');
+            const main = await migrateOne(banner.imageUrl, 'banners', 'banner.imageUrl');
             if (!main.skipped) {
                 banner.imageUrl = main.url;
                 changed = true;
@@ -254,7 +273,7 @@ async function run() {
 
         if (banner.mobileImageUrl) {
             try {
-                const mobile = await migrateOne(banner.mobileImageUrl, 'banners');
+                const mobile = await migrateOne(banner.mobileImageUrl, 'banners', 'banner.mobileImageUrl');
                 if (!mobile.skipped) {
                     banner.mobileImageUrl = mobile.url;
                     changed = true;

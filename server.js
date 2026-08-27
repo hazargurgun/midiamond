@@ -43,23 +43,56 @@ app.use(express.static(path.join(__dirname, 'public'), {
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-// Session
+// Session (Mongo yoksa MemoryStore — yerel bakım önizlemesi için)
 const isProduction = process.env.NODE_ENV === 'production';
-app.use(session({
-    secret: process.env.SESSION_SECRET,
+const sessionOptions = {
+    secret: process.env.SESSION_SECRET || 'local-dev-secret',
     resave: false,
     saveUninitialized: false,
-    store: (MongoStore.create || MongoStore.default.create)({
-        mongoUrl: process.env.MONGODB_URI,
-        ttl: 14 * 24 * 60 * 60 // 14 days
-    }),
     cookie: {
         maxAge: 1000 * 60 * 60 * 24 * 14, // 14 days
         secure: isProduction,
         httpOnly: true,
         sameSite: 'lax'
     }
-}));
+};
+if (process.env.MONGODB_URI) {
+    sessionOptions.store = (MongoStore.create || MongoStore.default.create)({
+        mongoUrl: process.env.MONGODB_URI,
+        ttl: 14 * 24 * 60 * 60
+    });
+}
+app.use(session(sessionOptions));
+
+function isMaintenanceEnabled() {
+    const value = String(process.env.MAINTENANCE_MODE || '').trim().toLowerCase();
+    return value === '1' || value === 'true' || value === 'yes' || value === 'on';
+}
+
+app.get('/health', (req, res) => {
+    res.status(200).json({ ok: true });
+});
+
+// Public site shows a branded maintenance page. Admin, PayTR callback, and /health stay open.
+app.use((req, res, next) => {
+    if (!isMaintenanceEnabled()) return next();
+
+    const path = req.path || '';
+    if (path.startsWith('/admin') || path === '/health') return next();
+
+    const bypassKey = process.env.MAINTENANCE_BYPASS_KEY;
+    if (bypassKey) {
+        if (req.query.preview === bypassKey) {
+            req.session.maintenanceBypass = true;
+            return next();
+        }
+        if (req.session.maintenanceBypass) return next();
+    }
+
+    res.set('Retry-After', '3600');
+    res.set('Cache-Control', 'no-store');
+    return res.status(503).render('maintenance');
+});
 
 // Global variables for views
 app.use(async (req, res, next) => {
